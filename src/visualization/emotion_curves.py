@@ -12,7 +12,7 @@ EMOTION_COLORS = {
 KEY_EMOTIONS = ["fear", "anger", "joy", "gratitude", "sadness", "pride"]
 
 
-def create_emotion_trajectory_chart(daily_df: pd.DataFrame, title="Emotion Trajectories Over Time") -> go.Figure:
+def create_emotion_trajectory_chart(daily_df, title="Emotion Trajectories Over Time"):
     fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.08,
                         row_heights=[0.75, 0.25], subplot_titles=("Emotion Intensity", "Post Volume"))
     for emo in KEY_EMOTIONS:
@@ -26,8 +26,10 @@ def create_emotion_trajectory_chart(daily_df: pd.DataFrame, title="Emotion Traje
         fig.add_trace(go.Bar(x=daily_df["date"], y=daily_df["n_posts"], name="Posts",
                              marker_color="rgba(100,100,100,0.4)"), row=2, col=1)
     for m in EVENT_MARKERS:
-        fig.add_vline(x=m["date"], line_dash="dash", line_color=m["color"], line_width=1.5,
-                      annotation_text=m["label"], annotation_position="top left", annotation_font_size=9)
+        fig.add_shape(type="line", x0=m["date"], x1=m["date"], y0=0, y1=1,
+                      yref="paper", line=dict(color=m["color"], width=1.5, dash="dash"))
+        fig.add_annotation(x=m["date"], y=1.02, yref="paper", text=m["label"],
+                           showarrow=False, font=dict(size=9, color=m["color"]), textangle=-30)
     fig.update_layout(title=title, height=650, template="plotly_white",
                       legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1), hovermode="x unified")
     fig.update_yaxes(title_text="Mean Probability", row=1, col=1)
@@ -35,7 +37,7 @@ def create_emotion_trajectory_chart(daily_df: pd.DataFrame, title="Emotion Traje
     return fig
 
 
-def create_phase_comparison_chart(phase_df: pd.DataFrame) -> go.Figure:
+def create_phase_comparison_chart(phase_df):
     fig = go.Figure()
     order = [p for p in PHASES if p in phase_df["phase"].values]
     labels = [PHASES[p]["label"] for p in order]
@@ -54,7 +56,7 @@ def create_phase_comparison_chart(phase_df: pd.DataFrame) -> go.Figure:
     return fig
 
 
-def create_platform_contrast_chart(platform_df: pd.DataFrame) -> go.Figure:
+def create_platform_contrast_chart(platform_df):
     fig = go.Figure()
     emos = KEY_EMOTIONS
     for _, row in platform_df.iterrows():
@@ -66,12 +68,13 @@ def create_platform_contrast_chart(platform_df: pd.DataFrame) -> go.Figure:
     return fig
 
 
-def create_sentiment_heatmap(daily_df: pd.DataFrame) -> go.Figure:
+def create_sentiment_heatmap(daily_df):
     cols = [f"{e}_mean" for e in TARGET_EMOTIONS if f"{e}_mean" in daily_df.columns]
     labels = [c.replace("_mean", "").capitalize() for c in cols]
     fig = go.Figure(data=go.Heatmap(z=daily_df[cols].values.T, x=daily_df["date"], y=labels,
                                      colorscale="RdYlGn_r", colorbar=dict(title="Intensity")))
     for m in EVENT_MARKERS:
-        fig.add_vline(x=m["date"], line_dash="dash", line_color=m["color"], line_width=1)
+        fig.add_shape(type="line", x0=m["date"], x1=m["date"], y0=0, y1=1,
+                      yref="paper", line=dict(color=m["color"], width=1, dash="dash"))
     fig.update_layout(title="Emotion Heatmap", template="plotly_white", height=400)
     return fig
