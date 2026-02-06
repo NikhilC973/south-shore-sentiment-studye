@@ -90,7 +90,7 @@ def store_to_db(df: pd.DataFrame) -> None:
     df = df[expected_cols].copy()
 
     # Convert dt_utc to proper timestamp
-    df["dt_utc"] = pd.to_datetime(df["dt_utc"], utc=True)
+    df["dt_utc"] = pd.to_datetime(df["dt_utc"], utc=True, format="mixed")
 
     # Deduplicate by id
     df = df.drop_duplicates(subset=["id"], keep="first")

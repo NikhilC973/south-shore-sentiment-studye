@@ -142,6 +142,10 @@ def run_cleaning():
     # Phase tagging
     df["phase"] = df["dt_utc"].astype(str).apply(detect_phase)
 
+    # Filter out posts outside analysis window
+    df = df[df["phase"].isin(["pre", "event", "post_week1", "post_week2", "post_weeks3_5"])].copy()
+    log.info(f"After date filtering: {len(df)} posts within analysis window")
+    
     # Neighborhood detection
     df["neighborhoods"] = df["text_clean"].apply(detect_neighborhoods)
     df["has_geo"] = df["neighborhoods"].apply(lambda x: len(x) > 0)

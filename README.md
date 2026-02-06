@@ -240,6 +240,28 @@ The Streamlit dashboard includes:
 4. **Methodology** — Ethics statement, verification levels, limitations
 5. **Program Guidance** — Actionable recommendations with timing
 
+## 📸 Dashboard Preview
+
+### Home
+![Home](docs/screenshots/home%20page.png)
+
+### Overview — Emotion Trajectories
+![Overview 1](docs/screenshots/Overview_1.png)
+![Overview 2](docs/screenshots/Overview_2.png)
+![Overview 3](docs/screenshots/Overview_3.png)
+
+### Discussion Themes
+![Themes](docs/screenshots/Themes.png)
+
+### Geography
+![Geography 1](docs/screenshots/geography_1.png)
+![Geography 2](docs/screenshots/geography_2.png)
+
+### Methodology & Ethics
+![Methodology](docs/screenshots/methodology.png)
+
+### Program Guidance
+![Guidance](docs/screenshots/guidance.png)
 ---
 
 ## ⚖️ Ethics & Governance
