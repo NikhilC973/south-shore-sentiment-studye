@@ -1,0 +1,96 @@
+"""
+Shared constants for the South Shore Sentiment Study.
+"""
+from datetime import datetime, timezone, timedelta
+from pathlib import Path
+
+# ── Project Root ─────────────────────────────────────────
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+CONFIG_DIR = PROJECT_ROOT / "config"
+DATA_DIR = PROJECT_ROOT / "data"
+
+# ── Anchor Event ─────────────────────────────────────────
+CDT = timezone(timedelta(hours=-5))
+T_ZERO = datetime(2025, 9, 30, 6, 0, 0, tzinfo=CDT)
+
+# ── Collection Window ────────────────────────────────────
+COLLECTION_START = datetime(2025, 9, 16, tzinfo=CDT)
+COLLECTION_END = datetime(2025, 10, 14, 23, 59, 59, tzinfo=CDT)
+EXTENDED_END = datetime(2025, 11, 7, 23, 59, 59, tzinfo=CDT)
+
+# ── Phase Boundaries (as UTC timestamps for DuckDB) ─────
+PHASES = {
+    "pre":          {"start": "2025-09-16", "end": "2025-09-29", "label": "Pre-Raid Baseline"},
+    "event":        {"start": "2025-09-29", "end": "2025-10-01", "label": "Event Window (±24h)"},
+    "post_week1":   {"start": "2025-10-01", "end": "2025-10-07", "label": "Post-Raid Week 1"},
+    "post_week2":   {"start": "2025-10-08", "end": "2025-10-14", "label": "Post-Raid Week 2"},
+    "post_weeks3_5":{"start": "2025-10-15", "end": "2025-11-07", "label": "Extended Monitoring"},
+}
+
+# ── Target Subreddits ────────────────────────────────────
+SUBREDDITS = [
+    "Chicago", "news", "Illinois", "AskChicago", "50501Chicago",
+    "EyesOnIce", "moderatepolitics", "politics", "ICE_Raids",
+    "WindyCity", "AskConservatives", "somethingiswrong2024",
+    "immigration", "ChicagoSuburbs",
+]
+
+# ── Search Terms ─────────────────────────────────────────
+SEARCH_TERMS = [
+    "South Shore ICE",
+    "South Shore raid",
+    "South Shore immigration",
+    "Chicago ICE raid",
+    "Operation Midway Blitz",
+    "South Shore helicopters",
+    "South Shore flashbang",
+    "ICE raid Chicago apartment",
+    "South Shore CBP",
+    "Chicago immigration enforcement",
+]
+
+# ── Neighborhood Lexicon ─────────────────────────────────
+NEIGHBORHOOD_LEXICON = {
+    "South Shore": ["South Shore", "south shore", "71st", "Jeffery", "67th",
+                     "79th and Exchange", "South Shore Drive"],
+    "South Chicago": ["South Chicago", "south chicago", "83rd", "Commercial Ave",
+                       "South Chicago Ave"],
+    "Woodlawn": ["Woodlawn", "woodlawn", "63rd", "Cottage Grove"],
+    "Greater Grand Crossing": ["Grand Crossing", "grand crossing", "75th"],
+    "Avalon Park": ["Avalon Park", "avalon park"],
+    "Calumet Heights": ["Calumet Heights", "calumet heights"],
+}
+
+# ── Notable Event Dates (for overlays) ──────────────────
+EVENT_MARKERS = [
+    {"date": "2025-09-30", "label": "ICE/CBP Raid (t=0)", "color": "red"},
+    {"date": "2025-10-06", "label": "DHS 'Midway Blitz' Statement", "color": "orange"},
+    {"date": "2025-10-21", "label": "AP National Spotlight", "color": "blue"},
+    {"date": "2025-10-24", "label": "Block Club Distress Coverage", "color": "purple"},
+    {"date": "2025-10-27", "label": "South Side Weekly 911 Audio", "color": "darkgreen"},
+]
+
+# ── GoEmotions → Target Emotion Mapping ─────────────────
+GOEMOTIONS_MAP = {
+    "admiration": "pride", "amusement": "joy", "anger": "anger",
+    "annoyance": "anger", "approval": "gratitude", "caring": "gratitude",
+    "confusion": "fear", "curiosity": "surprise", "desire": "joy",
+    "disappointment": "sadness", "disapproval": "anger", "disgust": "disgust",
+    "embarrassment": "sadness", "excitement": "joy", "fear": "fear",
+    "gratitude": "gratitude", "grief": "sadness", "joy": "joy",
+    "love": "gratitude", "nervousness": "fear", "optimism": "joy",
+    "pride": "pride", "realization": "surprise", "relief": "joy",
+    "remorse": "sadness", "sadness": "sadness", "surprise": "surprise",
+}
+
+TARGET_EMOTIONS = ["fear", "anger", "sadness", "joy", "surprise",
+                    "disgust", "gratitude", "pride"]
+
+# ── Platforms ────────────────────────────────────────────
+PLATFORMS = ["reddit", "news_comment"]
+
+# ── DB Tables ────────────────────────────────────────────
+TABLE_POSTS_RAW = "posts_raw"
+TABLE_POSTS_CLEAN = "posts_clean"
+TABLE_EMOTIONS = "posts_emotions"
+TABLE_TOPICS = "posts_topics"

@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+
+# Data (keep structure, not contents)
+data/raw/*
+data/processed/*
+data/synthetic/*
+data/exports/*
+data/*.duckdb
+data/*.duckdb.wal
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/synthetic/.gitkeep
+!data/exports/.gitkeep
+
+# Environment
+.env
+*.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Models (too large for git)
+data/processed/bertopic_model/
+
+# Jupyter
+.ipynb_checkpoints/
+notebooks/*.ipynb
+
+# Reports (generated)
+docs/report/*.pdf
