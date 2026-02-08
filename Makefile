@@ -1,5 +1,5 @@
 # ============================================================
-# South Shore Sentiment Study — Makefile
+# Aftermath_Sentiment_Study — Makefile
 # ============================================================
 .PHONY: help install init-db ingest ingest-synthetic clean-data analyze dashboard report run-all test lint
 
