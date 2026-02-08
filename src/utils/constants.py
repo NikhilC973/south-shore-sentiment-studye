@@ -1,33 +1,39 @@
 """
 Shared constants for the South Shore Sentiment Study.
+
+Updated: Extended analysis window to Dec 12, 2025 (building vacated).
+Added verified event markers from Block Club Chicago reporting.
 """
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
-# ── Project Root ─────────────────────────────────────────
+# ── Project Root ─────────────────────────────────────────────
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 CONFIG_DIR = PROJECT_ROOT / "config"
 DATA_DIR = PROJECT_ROOT / "data"
 
-# ── Anchor Event ─────────────────────────────────────────
+# ── Anchor Event ─────────────────────────────────────────────
 CDT = timezone(timedelta(hours=-5))
 T_ZERO = datetime(2025, 9, 30, 6, 0, 0, tzinfo=CDT)
 
-# ── Collection Window ────────────────────────────────────
+# ── Collection Window (EXTENDED to Dec 12) ───────────────────
 COLLECTION_START = datetime(2025, 9, 16, tzinfo=CDT)
 COLLECTION_END = datetime(2025, 10, 14, 23, 59, 59, tzinfo=CDT)
-EXTENDED_END = datetime(2025, 11, 7, 23, 59, 59, tzinfo=CDT)
+EXTENDED_END = datetime(2025, 12, 12, 23, 59, 59, tzinfo=CDT)  # Building vacated
 
-# ── Phase Boundaries (as UTC timestamps for DuckDB) ─────
+# ── Phase Boundaries ─────────────────────────────────────────
+# Extended from 5 phases to 7 to capture tenants union + displacement
 PHASES = {
-    "pre":          {"start": "2025-09-16", "end": "2025-09-29", "label": "Pre-Raid Baseline"},
-    "event":        {"start": "2025-09-29", "end": "2025-10-01", "label": "Event Window (±24h)"},
-    "post_week1":   {"start": "2025-10-01", "end": "2025-10-07", "label": "Post-Raid Week 1"},
-    "post_week2":   {"start": "2025-10-08", "end": "2025-10-14", "label": "Post-Raid Week 2"},
-    "post_weeks3_5":{"start": "2025-10-15", "end": "2025-11-07", "label": "Extended Monitoring"},
+    "pre":           {"start": "2025-09-16", "end": "2025-09-29", "label": "Pre-Raid Baseline"},
+    "event":         {"start": "2025-09-29", "end": "2025-10-01", "label": "Event Window (±24h)"},
+    "post_week1":    {"start": "2025-10-01", "end": "2025-10-07", "label": "Post-Raid Week 1"},
+    "post_week2":    {"start": "2025-10-08", "end": "2025-10-14", "label": "Post-Raid Week 2"},
+    "post_weeks3_5": {"start": "2025-10-15", "end": "2025-11-07", "label": "Extended Monitoring"},
+    "court_action":  {"start": "2025-11-08", "end": "2025-11-30", "label": "Court Action & Tenants Union"},
+    "displacement":  {"start": "2025-12-01", "end": "2025-12-12", "label": "Forced Displacement"},
 }
 
-# ── Target Subreddits ────────────────────────────────────
+# ── Target Subreddits ────────────────────────────────────────
 SUBREDDITS = [
     "Chicago", "news", "Illinois", "AskChicago", "50501Chicago",
     "EyesOnIce", "moderatepolitics", "politics", "ICE_Raids",
@@ -35,7 +41,7 @@ SUBREDDITS = [
     "immigration", "ChicagoSuburbs",
 ]
 
-# ── Search Terms ─────────────────────────────────────────
+# ── Search Terms (expanded) ──────────────────────────────────
 SEARCH_TERMS = [
     "South Shore ICE",
     "South Shore raid",
@@ -47,12 +53,18 @@ SEARCH_TERMS = [
     "ICE raid Chicago apartment",
     "South Shore CBP",
     "Chicago immigration enforcement",
+    "7500 South Shore Drive",
+    "South Shore tenants union",
+    "South Shore eviction",
+    "Trinity Flood South Shore",
+    "South Shore building cleared",
 ]
 
-# ── Neighborhood Lexicon ─────────────────────────────────
+# ── Neighborhood Lexicon ─────────────────────────────────────
 NEIGHBORHOOD_LEXICON = {
     "South Shore": ["South Shore", "south shore", "71st", "Jeffery", "67th",
-                     "79th and Exchange", "South Shore Drive"],
+                     "79th and Exchange", "South Shore Drive", "7500 S. South Shore",
+                     "7500 South Shore"],
     "South Chicago": ["South Chicago", "south chicago", "83rd", "Commercial Ave",
                        "South Chicago Ave"],
     "Woodlawn": ["Woodlawn", "woodlawn", "63rd", "Cottage Grove"],
@@ -61,16 +73,33 @@ NEIGHBORHOOD_LEXICON = {
     "Calumet Heights": ["Calumet Heights", "calumet heights"],
 }
 
-# ── Notable Event Dates (for overlays) ──────────────────
+# ── Verified Event Markers (from Block Club Chicago reporting) ──
+# These replace the original placeholder markers with journalist-verified events
 EVENT_MARKERS = [
-    {"date": "2025-09-30", "label": "ICE/CBP Raid (t=0)", "color": "red"},
-    {"date": "2025-10-06", "label": "DHS 'Midway Blitz' Statement", "color": "orange"},
-    {"date": "2025-10-21", "label": "AP National Spotlight", "color": "blue"},
-    {"date": "2025-10-24", "label": "Block Club Distress Coverage", "color": "purple"},
-    {"date": "2025-10-27", "label": "South Side Weekly 911 Audio", "color": "darkgreen"},
+    {"date": "2025-09-30", "label": "Operation Midway Blitz (t=0)",
+     "color": "red", "verification": "L1",
+     "source": "Block Club Chicago, AP, WBEZ"},
+    {"date": "2025-10-01", "label": "Residents Return to Ransacked Apts",
+     "color": "darkred", "verification": "L2",
+     "source": "Block Club Chicago"},
+    {"date": "2025-10-24", "label": "Distress Calls Investigation Published",
+     "color": "purple", "verification": "L2",
+     "source": "Block Club Chicago"},
+    {"date": "2025-11-07", "label": "Judge Orders Building Cleared",
+     "color": "orange", "verification": "L2",
+     "source": "Block Club Chicago"},
+    {"date": "2025-11-24", "label": "Tenants Union Formed",
+     "color": "blue", "verification": "L2",
+     "source": "Block Club Chicago"},
+    {"date": "2025-12-08", "label": "Eviction Deadline Denied Extension",
+     "color": "brown", "verification": "L2",
+     "source": "Block Club Chicago"},
+    {"date": "2025-12-12", "label": "Building Vacated",
+     "color": "black", "verification": "L2",
+     "source": "Block Club Chicago"},
 ]
 
-# ── GoEmotions → Target Emotion Mapping ─────────────────
+# ── GoEmotions → Target Emotion Mapping ──────────────────────
 GOEMOTIONS_MAP = {
     "admiration": "pride", "amusement": "joy", "anger": "anger",
     "annoyance": "anger", "approval": "gratitude", "caring": "gratitude",
@@ -86,10 +115,10 @@ GOEMOTIONS_MAP = {
 TARGET_EMOTIONS = ["fear", "anger", "sadness", "joy", "surprise",
                     "disgust", "gratitude", "pride"]
 
-# ── Platforms ────────────────────────────────────────────
+# ── Platforms ────────────────────────────────────────────────
 PLATFORMS = ["reddit", "news_comment"]
 
-# ── DB Tables ────────────────────────────────────────────
+# ── DB Tables ────────────────────────────────────────────────
 TABLE_POSTS_RAW = "posts_raw"
 TABLE_POSTS_CLEAN = "posts_clean"
 TABLE_EMOTIONS = "posts_emotions"

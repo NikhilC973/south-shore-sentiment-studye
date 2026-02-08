@@ -1,20 +1,22 @@
 # ============================================================
 # South Shore Sentiment Study — Central Configuration
 # ============================================================
+# Updated: Extended analysis window to Dec 12, 2025
+# Added verified event sourcing from Block Club Chicago
 
 project:
   name: "South Shore Sentiment Study"
-  version: "1.0.0"
+  version: "2.0.0"
   anchor_event: "ICE/CBP raid in South Shore, Chicago"
   t_zero: "2025-09-30T06:00:00-05:00"  # CDT
 
 # ----------------------------------------------------------
-# Time windows
+# Time windows (EXTENDED to capture full aftermath)
 # ----------------------------------------------------------
 windows:
   collection_start: "2025-09-16"
   collection_end: "2025-10-14"
-  extended_end: "2025-11-07"
+  extended_end: "2025-12-12"  # Building vacated by court order
 
 phases:
   pre:
@@ -37,6 +39,19 @@ phases:
     start: "2025-10-15"
     end: "2025-11-07"
     label: "Extended Monitoring"
+  court_action:
+    start: "2025-11-08"
+    end: "2025-11-30"
+    label: "Court Action & Tenants Union"
+  displacement:
+    start: "2025-12-01"
+    end: "2025-12-12"
+    label: "Forced Displacement"
+
+# ----------------------------------------------------------
+# Verified event sources
+# ----------------------------------------------------------
+verified_events_file: "config/verified_events.yaml"
 
 # ----------------------------------------------------------
 # Reddit collection (no official API)
@@ -70,6 +85,12 @@ reddit:
     - "ICE raid Chicago apartment"
     - "South Shore CBP"
     - "Chicago immigration enforcement"
+    # Extended search terms for later phases
+    - "7500 South Shore Drive"
+    - "South Shore tenants union"
+    - "South Shore eviction"
+    - "Trinity Flood South Shore"
+    - "South Shore building cleared"
 
   # PullPush.io (Pushshift successor)
   pullpush:
@@ -83,7 +104,7 @@ reddit:
   old_reddit:
     base_url: "https://old.reddit.com"
     rate_limit_seconds: 2.5
-    user_agent: "SouthShoreSentimentStudy/1.0 (Academic Research)"
+    user_agent: "SouthShoreSentimentStudy/2.0 (Academic Research)"
 
 # ----------------------------------------------------------
 # News sources
@@ -95,6 +116,7 @@ news:
       search_url: "https://blockclubchicago.org/?s={query}"
       robots_compliant: true
       rate_limit_seconds: 3.0
+      note: "Primary verified source — robots.txt blocks scraping, use as citation only"
 
     - name: "WBEZ"
       domain: "wbez.org"
@@ -125,6 +147,8 @@ news:
     - "Chicago ICE raid apartment"
     - "Operation Midway Blitz"
     - "South Shore immigration enforcement"
+    - "7500 South Shore Drive eviction"
+    - "South Shore tenants union"
 
 # ----------------------------------------------------------
 # NLP models
@@ -199,7 +223,8 @@ geography:
   primary_zip: "60649"
   neighborhoods:
     south_shore:
-      terms: ["South Shore", "south shore", "71st", "Jeffery", "67th", "79th and Exchange"]
+      terms: ["South Shore", "south shore", "71st", "Jeffery", "67th",
+              "79th and Exchange", "7500 S. South Shore", "7500 South Shore"]
       community_area: 43
     south_chicago:
       terms: ["South Chicago", "south chicago", "83rd", "Commercial Ave"]
@@ -240,7 +265,7 @@ paths:
 # Synthetic data (fallback when live sources unavailable)
 # ----------------------------------------------------------
 synthetic:
-  n_posts: 2500
+  n_posts: 3500  # Increased for extended window
   seed: 42
   platforms: ["reddit", "news_comment"]
   subreddit_weights:

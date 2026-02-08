@@ -1,9 +1,12 @@
 """
 Synthetic Data Generator — Realistic fallback data for development & testing.
 
-Generates ~2500 posts mimicking real discourse patterns around the South Shore
+Generates ~3500 posts mimicking real discourse patterns around the South Shore
 ICE raid, with realistic temporal distribution, emotion profiles, and
 neighborhood mentions that follow expected sentiment trajectories.
+
+Updated: Extended to 7 phases through Dec 12, 2025 (building vacated).
+Templates informed by Block Club Chicago verified reporting.
 """
 import hashlib
 import random
@@ -16,7 +19,7 @@ from src.utils.constants import (
 from src.utils.logger import log
 
 
-# ── Template Banks by Phase ──────────────────────────────
+# ── Template Banks by Phase ──────────────────────────────────
 # These templates simulate realistic discourse; NO real posts are reproduced.
 
 TEMPLATES = {
@@ -60,6 +63,8 @@ TEMPLATES = {
             "Where are our elected officials? Radio silence while our community is under siege.",
             "The trauma this is causing children in South Shore will last for years.",
             "Cell phone video of the raid is spreading. The whole neighborhood is in shock.",
+            "Hundreds of agents in camo with rented moving trucks. They broke down doors at 7500 S South Shore.",
+            "Neighbor says she was awoken by a black helicopter looping over the scene. Like a war zone.",
         ],
         "news_comment": [
             "Horrifying. Using flashbangs in residential buildings with children is unconscionable.",
@@ -86,6 +91,8 @@ TEMPLATES = {
             "Teachers at South Shore schools reporting behavioral changes in students since the raid.",
             "City council meeting tonight to discuss the aftermath. We need answers.",
             "Solidarity from Woodlawn. What happened in South Shore could happen anywhere.",
+            "Residents returning to 7500 S South Shore Drive finding apartments ransacked. Zip ties and blood on floors.",
+            "An army veteran living in the building had his door broken and belongings stolen during the raid.",
         ],
         "news_comment": [
             "The community response has been incredible. People coming together like I've never seen.",
@@ -129,6 +136,8 @@ TEMPLATES = {
             "Reflections: the fear has transformed into organized power. That's South Shore.",
             "Legal cases moving forward. NIJC representing multiple affected families.",
             "Schools in South Shore implementing new support protocols for students.",
+            "The building at 7500 S South Shore averaged more than one emergency call per day for 5 years before the raid.",
+            "Judge just ordered the building cleared. Appointing a receiver to take control from the landlord.",
         ],
         "news_comment": [
             "The long-term organizing emerging from this crisis is exactly what communities need.",
@@ -136,9 +145,52 @@ TEMPLATES = {
             "Policy changes are needed to prevent this from happening in other neighborhoods.",
         ],
     },
+    "court_action": {
+        "reddit": [
+            "Tenants at 7500 S South Shore Drive just formed a union. About 30 residents demanding relocation help.",
+            "The court-appointed receiver hasn't delivered on any promises. No heat, no security, sewage still flooding floors.",
+            "Tenants union press conference today. Demanding $7,500 relocation assistance per family.",
+            "The building owner is from Wisconsin. Bought three South Shore buildings in 2020, defaulted on all loans.",
+            "Strength in Management — the property company — let conditions deteriorate before the raid. Guards removed, maintenance stopped.",
+            "Court hearing update: Judge gave management more time to clean up but residents say nothing's changed.",
+            "The foreclosure case has been going on for years. Wells Fargo wants the building. Tenants caught in the middle.",
+            "Receiver Friedman also let feds use one of his other properties to stage immigration operations. Conflict of interest much?",
+            "Where is the accountability for the landlord? Trinity Flood let this building become a death trap.",
+            "Housing organizers from Southside Together helping residents navigate impossible choices.",
+            "Only 37 occupants left in a 130-unit building. Most fled after the raid with nowhere to go.",
+            "CHA needs to expedite Section 8 inspections for remaining residents with vouchers.",
+        ],
+        "news_comment": [
+            "The tenants union is doing incredibly brave work in impossible circumstances.",
+            "This is what happens when housing is treated as an investment vehicle instead of a human right.",
+            "The judge needs to give these families more time. Finding housing in December is nearly impossible.",
+            "Property management companies that let buildings deteriorate should face criminal charges.",
+            "Block Club's reporting on this has been outstanding. Local journalism matters.",
+        ],
+    },
+    "displacement": {
+        "reddit": [
+            "Judge denied the tenants union request for more time. Dec 12 deadline stands. Families scrambling.",
+            "Workers installing steel window guards at 7500 S South Shore. They're sealing the building up.",
+            "The judge said she doesn't care about political statements when the mayor wrote asking for more time.",
+            "Being in a building with bad conditions is better than being homeless. That's the choice these families face.",
+            "Tenants union accepting the $5,000 relocation offer. It's not enough but there's no other option.",
+            "Today is the last day. Everyone has to be out of 7500 S South Shore Drive by end of day.",
+            "From ICE raid to eviction in 73 days. This is what happened to South Shore residents.",
+            "Where do 37 families go in December in Chicago? This is a housing crisis on top of a trauma crisis.",
+            "The building is empty now. Boarded up. After everything those residents went through.",
+            "Elevator couldn't even reach the top floor. Residents in wheelchairs couldn't get down safely.",
+        ],
+        "news_comment": [
+            "The timeline from raid to eviction is devastating. These are real people with real lives.",
+            "Finding a lease starting Dec 12 is impossible in Chicago. The judge should have known that.",
+            "The $5,000 relocation assistance is a joke. Average security deposit plus first month is more than that.",
+            "This story shows how enforcement actions create cascading displacement.",
+        ],
+    },
 }
 
-# ── Emotion Profiles by Phase ────────────────────────────
+# ── Emotion Profiles by Phase ────────────────────────────────
 # Expected emotional distribution (probabilities) per phase
 EMOTION_PROFILES = {
     "pre": {"fear": 0.35, "anger": 0.15, "sadness": 0.10, "joy": 0.05,
@@ -151,15 +203,21 @@ EMOTION_PROFILES = {
                    "surprise": 0.05, "disgust": 0.02, "gratitude": 0.25, "pride": 0.20},
     "post_weeks3_5": {"fear": 0.05, "anger": 0.10, "sadness": 0.08, "joy": 0.15,
                       "surprise": 0.05, "disgust": 0.02, "gratitude": 0.25, "pride": 0.30},
+    "court_action": {"fear": 0.10, "anger": 0.25, "sadness": 0.20, "joy": 0.03,
+                     "surprise": 0.05, "disgust": 0.07, "gratitude": 0.15, "pride": 0.15},
+    "displacement": {"fear": 0.15, "anger": 0.30, "sadness": 0.30, "joy": 0.02,
+                     "surprise": 0.03, "disgust": 0.08, "gratitude": 0.07, "pride": 0.05},
 }
 
-# ── Temporal Distribution ────────────────────────────────
+# ── Temporal Distribution ────────────────────────────────────
 PHASE_POST_WEIGHTS = {
-    "pre": 0.15,          # Moderate baseline chatter
-    "event": 0.30,        # Spike during raid
-    "post_week1": 0.25,   # High aftermath volume
-    "post_week2": 0.18,   # Declining but significant
-    "post_weeks3_5": 0.12, # Extended tail
+    "pre": 0.12,            # Moderate baseline chatter
+    "event": 0.22,          # Spike during raid
+    "post_week1": 0.20,     # High aftermath volume
+    "post_week2": 0.14,     # Declining but significant
+    "post_weeks3_5": 0.12,  # Extended tail
+    "court_action": 0.12,   # Renewed attention with court
+    "displacement": 0.08,   # Final phase — smaller but intense
 }
 
 SUBREDDIT_WEIGHTS = {
@@ -201,7 +259,7 @@ def _add_neighborhood_mentions(text: str, rng: random.Random) -> tuple[str, list
 
 
 def generate_synthetic_data(
-    n_posts: int = 2500,
+    n_posts: int = 3500,
     seed: int = 42,
 ) -> list[dict]:
     """
@@ -286,6 +344,7 @@ def generate_synthetic_data(
                 "search_term": rng.choice([
                     "South Shore ICE", "Chicago ICE raid", "Operation Midway Blitz",
                     "South Shore raid", "ICE raid Chicago apartment",
+                    "South Shore tenants union", "7500 South Shore Drive",
                 ]),
             })
 
@@ -304,6 +363,6 @@ def generate_synthetic_data(
 
 if __name__ == "__main__":
     import json
-    posts = generate_synthetic_data(n_posts=2500)
+    posts = generate_synthetic_data(n_posts=3500)
     print(f"Generated {len(posts)} posts")
     print(json.dumps(posts[0], indent=2, default=str))

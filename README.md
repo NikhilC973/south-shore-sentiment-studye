@@ -5,13 +5,14 @@
 [![Streamlit](https://img.shields.io/badge/Streamlit-Dashboard-FF4B4B.svg)](https://streamlit.io)
 [![DuckDB](https://img.shields.io/badge/DuckDB-Analytical_Engine-FEF000.svg)](https://duckdb.org)
 
-> **Measuring how public sentiment in South Shore and adjacent Chicago neighborhoods evolved before and after the September 30, 2025 ICE/CBP raid — mapping emotional trajectories from fear → anger → solidarity → resilience.**
+> **Measuring how public sentiment in South Shore and adjacent Chicago neighborhoods evolved before and after the September 30, 2025 ICE/CBP raid — mapping emotional trajectories from fear → anger → solidarity → resilience → displacement.**
 
 ---
 
 ## 📋 Table of Contents
 
 - [Project Overview](#-project-overview)
+- [Real-World Context](#-real-world-context)
 - [Architecture](#-architecture)
 - [Folder Structure](#-folder-structure)
 - [Setup & Installation](#-setup--installation)
@@ -19,6 +20,7 @@
 - [Data Sources](#-data-sources)
 - [Methodology](#-methodology)
 - [Dashboard](#-dashboard)
+- [Dashboard Preview](#-dashboard-preview)
 - [Ethics & Governance](#-ethics--governance)
 - [Results](#-results)
 - [Contributing](#-contributing)
@@ -27,22 +29,44 @@
 
 ## 🎯 Project Overview
 
-**Anchor Event:** ICE/CBP enforcement action in South Shore, Chicago — September 30, 2025 (t=0)
+**Anchor Event:** Operation Midway Blitz — ICE/CBP/FBI/ATF enforcement action at 7500 S. South Shore Drive, Chicago — September 30, 2025 (t=0)
 
-**Analysis Window:** Sep 16 – Oct 14, 2025 (±14 days), extended to Nov 7 for sustained effects
+**Analysis Window:** Sep 16 – Dec 12, 2025 (73 days, from pre-raid baseline through forced displacement)
 
-**Objective:** Produce actionable timing guidance for community outreach and services by tracking emotional arcs across:
-- Reddit communities (r/Chicago, r/news, r/Illinois, r/politics, etc.)
-- News comment sections (Block Club, WBEZ, Sun-Times, South Side Weekly)
+**Objective:** Produce actionable timing guidance for community outreach and services by tracking emotional arcs across 7 temporal phases, grounded in verified investigative journalism from Block Club Chicago.
 
 ### Key Deliverables
 | Deliverable | Description |
 |-------------|-------------|
 | **Sentiment Pipeline** | End-to-end NLP pipeline: ingestion → cleaning → emotion tagging → topic modeling |
-| **Longitudinal Analysis** | Emotion-over-time curves with bootstrapped CIs across phases |
-| **Interactive Dashboard** | Streamlit app with Overview, Themes, Geography, Methodology tabs |
-| **Program Guidance** | Timing recommendations for crisis comms, legal aid, mutual aid |
-| **Public Report** | 10-12 page PDF with executive summary and limitations |
+| **Longitudinal Analysis** | Emotion-over-time curves with bootstrapped CIs across 7 phases |
+| **Verified Event Timeline** | 14 journalist-verified events from Block Club Chicago investigative reporting |
+| **Interactive Dashboard** | Streamlit app with Overview, Themes, Geography, Timeline, Methodology, Guidance tabs |
+| **Program Guidance** | Timing recommendations for crisis comms, legal aid, mutual aid, displacement support |
+| **Public Report** | PDF with executive summary, verified context, and limitations |
+
+---
+
+## 📰 Real-World Context
+
+This project analyzes public sentiment surrounding a real and significant enforcement event. The emotional trajectories detected in social media discourse are grounded in verified investigative reporting by [Block Club Chicago](https://blockclubchicago.org/), an independent, nonprofit newsroom covering Chicago's neighborhoods.
+
+### Verified Event Timeline
+
+| Date | Event | Source |
+|------|-------|--------|
+| **Sep 30, 2025** | **Operation Midway Blitz** — Hundreds of federal agents (CBP/FBI/ATF/ICE) raid 7500 S. South Shore Dr at 2 AM. Helicopters, flashbangs, 37+ arrested. | [Block Club Chicago](https://blockclubchicago.org/2025/09/30/armed-agents-in-unmarked-vans-target-south-shore-apartment-building/) |
+| Oct 1, 2025 | Residents return to ransacked apartments — broken doors, stolen belongings, blood stains, zip ties on floors | [Block Club Chicago](https://blockclubchicago.org/2025/10/02/south-shore-residents-return-to-ransacked-apartments-try-to-move-out-after-ice-raid-it-looks-like-hell/) |
+| Oct 24, 2025 | Investigation reveals building averaged 1+ emergency calls/day for 5 years pre-raid | [Block Club Chicago](https://blockclubchicago.org/2025/10/24/south-shore-residents-made-thousands-of-distress-calls-to-city-before-massive-federal-raid/) |
+| Nov 7, 2025 | Judge orders building cleared, appoints receiver; owner loses control | [Block Club Chicago](https://blockclubchicago.org/2025/11/07/all-residents-to-leave-as-court-takes-control-of-south-shore-building-raided-by-feds/) |
+| Nov 24, 2025 | ~30 remaining tenants form union demanding relocation assistance | [Block Club Chicago](https://blockclubchicago.org/2025/11/24/raided-south-shore-buildings-remaining-tenants-say-they-havent-received-court-ordered-help/) |
+| Dec 8, 2025 | Judge denies extension, sets Dec 12 eviction deadline | [Block Club Chicago](https://blockclubchicago.org/2025/12/08/raided-south-shore-building-to-be-cleared-friday-after-judge-denies-residents-motion-for-more-time/) |
+| Dec 12, 2025 | Building vacated — all residents leave by court-ordered deadline | Block Club Chicago |
+| Jan 22, 2026 | State opens investigation into landlord tipping off federal agents | [Block Club Chicago](https://blockclubchicago.org/2026/01/22/did-landlord-tip-off-immigration-raid-at-troubled-south-shore-building-the-state-is-investigating/) |
+
+> **Note:** Block Club Chicago's `robots.txt` blocks automated scraping. These articles are cited as verified context sources, not scraped for content. Reddit discussions *about* these articles are collected through standard ingestion pipelines.
+
+Full verified timeline with 14 events: [`config/verified_events.yaml`](config/verified_events.yaml)
 
 ---
 
@@ -63,8 +87,8 @@
            │                       │                    │
            ▼                       ▼                    ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                   STORAGE (DuckDB)                          │
-│  posts_raw  │  posts_clean  │  posts_emotions  │  topics    │
+│               STORAGE (DuckDB) + Verified Events            │
+│  posts_raw │ posts_clean │ posts_emotions │ topics │ events │
 └──────────┬──────────────────┬────────────────────────┬──────┘
            │                  │                         │
            ▼                  ▼                         ▼
@@ -91,6 +115,7 @@ south-shore-sentiment-study/
 │       └── ci.yml                    # GitHub Actions CI
 ├── config/
 │   ├── settings.yaml                 # Central config (queries, thresholds, paths)
+│   ├── verified_events.yaml          # Block Club Chicago verified event timeline
 │   ├── source_registry.yaml          # Data source compliance registry
 │   └── .env.example                  # Environment template
 ├── data/
@@ -102,17 +127,18 @@ south-shore-sentiment-study/
 │   ├── ETHICS.md                     # Ethical use statement
 │   ├── METHODOLOGY.md                # Full methodology writeup
 │   ├── LIMITATIONS.md                # Known limitations
+│   ├── screenshots/                  # Dashboard screenshots
 │   └── report/                       # Final PDF report assets
 ├── src/
 │   ├── ingestion/
 │   │   ├── __init__.py
 │   │   ├── reddit_collector.py       # PullPush.io + Old Reddit JSON
 │   │   ├── news_collector.py         # News comment scraping
-│   │   ├── synthetic_generator.py    # Realistic synthetic data
+│   │   ├── synthetic_generator.py    # Realistic synthetic data (7 phases)
 │   │   └── pipeline.py              # Orchestrator for all sources
 │   ├── analysis/
 │   │   ├── __init__.py
-│   │   ├── cleaning.py               # Text normalization + dedup
+│   │   ├── cleaning.py               # Text normalization + dedup + 7-phase tagging
 │   │   ├── sentiment.py              # VADER + RoBERTa scoring
 │   │   ├── emotions.py               # GoEmotions multi-label
 │   │   ├── topics.py                 # BERTopic modeling
@@ -124,14 +150,16 @@ south-shore-sentiment-study/
 │   │   ├── emotion_curves.py         # Plotly emotion trajectories
 │   │   ├── topic_charts.py           # BERTopic visualizations
 │   │   ├── geo_charts.py             # Neighborhood comparisons
+│   │   ├── guidance.py               # Program timing recommendations
 │   │   └── report_generator.py       # PDF report builder
 │   └── utils/
 │       ├── __init__.py
 │       ├── db.py                      # DuckDB connection manager
 │       ├── logger.py                  # Structured logging
-│       └── constants.py               # Shared constants
+│       ├── constants.py               # Shared constants (7 phases)
+│       └── verified_events.py         # Event timeline loader
 ├── dashboards/
-│   └── app.py                        # Streamlit dashboard
+│   └── app.py                        # Streamlit dashboard (6 tabs)
 ├── tests/
 │   ├── test_cleaning.py
 │   ├── test_sentiment.py
@@ -205,14 +233,16 @@ Since Reddit's official API access was denied, we use **fully legal public-acces
 ### Target Subreddits
 `r/Chicago`, `r/news`, `r/Illinois`, `r/AskChicago`, `r/50501Chicago`, `r/EyesOnIce`, `r/moderatepolitics`, `r/politics`, `r/ICE_Raids`, `r/WindyCity`, `r/AskConservatives`, `r/somethingiswrong2024`
 
-### News Sources (Comment Scraping)
+### Verified Context Sources
 Block Club Chicago, WBEZ, Chicago Sun-Times, South Side Weekly, AP News
+
+> **Important:** Block Club Chicago articles are cited as **verified context sources** (not scraped). Their `robots.txt` blocks automated access. Reddit discussions *referencing* these articles are collected through standard pipelines.
 
 ---
 
 ## 🔬 Methodology
 
-### Phase Definitions
+### Phase Definitions (Extended 7-Phase Model)
 | Phase | Window | Description |
 |-------|--------|-------------|
 | `pre` | Sep 16–29 | Baseline sentiment before raid |
@@ -220,6 +250,8 @@ Block Club Chicago, WBEZ, Chicago Sun-Times, South Side Weekly, AP News
 | `post_week1` | Oct 1–7 | Early aftermath |
 | `post_week2` | Oct 8–14 | Stabilization period |
 | `post_weeks3_5` | Oct 15–Nov 7 | Extended monitoring |
+| `court_action` | Nov 8–30 | Court action & tenants union formation |
+| `displacement` | Dec 1–12 | Forced displacement & building vacancy |
 
 ### NLP Stack
 - **VADER**: Polarity baseline (positive/negative/neutral/compound)
@@ -228,17 +260,21 @@ Block Club Chicago, WBEZ, Chicago Sun-Times, South Side Weekly, AP News
 - **BERTopic**: Dynamic topic modeling with temporal tracking
 - **spaCy**: NER and geo-mention extraction
 
+### Verified Event Integration
+The analysis overlays 14 journalist-verified events from Block Club Chicago's investigative reporting. This grounds sentiment trajectory shifts in documented real-world events, enabling causal inference about what triggered emotional transitions. See [`config/verified_events.yaml`](config/verified_events.yaml).
+
 ---
 
 ## 📈 Dashboard
 
 The Streamlit dashboard includes:
 
-1. **Overview** — Emotion trajectory curves with confidence intervals
+1. **Overview** — Emotion trajectory curves with confidence intervals + verified event markers
 2. **Themes** — BERTopic clusters with top terms and exemplar posts
 3. **Geography** — Neighborhood-level sentiment heatmaps
-4. **Methodology** — Ethics statement, verification levels, limitations
-5. **Program Guidance** — Actionable recommendations with timing
+4. **Timeline** — Interactive verified event timeline with Block Club Chicago sourcing
+5. **Methodology** — Ethics statement, verification levels, limitations
+6. **Program Guidance** — Actionable recommendations with timing for all 7 phases
 
 ## 📸 Dashboard Preview
 
@@ -262,6 +298,7 @@ The Streamlit dashboard includes:
 
 ### Program Guidance
 ![Guidance](docs/screenshots/guidance.png)
+
 ---
 
 ## ⚖️ Ethics & Governance
@@ -269,7 +306,8 @@ The Streamlit dashboard includes:
 - **Public data only** — No private messages, no login-required content
 - **No PII** — Usernames stripped; no doxxing; no precise addresses
 - **Aggregate outputs only** — Individual posts never published verbatim
-- **Verification levels** — Official (FOIA/press), Two-source (media), Single-source (social)
+- **Verification levels** — L1: Official/court records, L2: Multi-source journalism, L3: Single media, L4: Social media
+- **Verified sourcing** — Event timeline grounded in Block Club Chicago investigative reporting
 - **Removal channel** — Organizations can request data removal
 
 See [docs/ETHICS.md](docs/ETHICS.md) for the full Ethical Use Statement.
