@@ -54,10 +54,13 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs(["📈 Overview","🔍 Themes","🗺️ G
 with tab1:
     st.header("Emotion Trajectory Overview")
     if not data["phase"].empty:
-        cols = st.columns(5)
+        cols = st.columns(len(PHASES))
         for i, (p, info) in enumerate(PHASES.items()):
-            r = data["phase"][data["phase"]["phase"]==p]
-            if not r.empty: cols[i].metric(info["label"], f'{int(r["n_posts"].iloc[0])} posts')
+            r = data["phase"][data["phase"]["phase"] == p]
+            if not r.empty and "n_posts" in r.columns:
+                cols[i].metric(info["label"], f'{int(r["n_posts"].iloc[0])} posts')
+            else:
+                cols[i].metric(info["label"], "0 posts")
     if not data["daily"].empty:
         st.plotly_chart(create_emotion_trajectory_chart(data["daily"]), width="stretch")
     c1, c2 = st.columns(2)

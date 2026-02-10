@@ -1,7 +1,7 @@
 """BERTopic — Dynamic topic modeling with keyword fallback."""
 import pandas as pd
 import numpy as np
-from src.utils.db import get_connection
+from src.utils.db import get_connection, init_database
 from src.utils.constants import PROJECT_ROOT
 from src.utils.logger import log
 
@@ -34,6 +34,7 @@ def _fallback_topic(text: str) -> tuple:
 
 def run_topic_modeling(min_topic_size: int = 5, nr_topics: str = "auto"):
     log.info("Starting BERTopic topic modeling")
+    init_database()
     conn = get_connection()
     df = conn.execute(
         "SELECT id, text_clean, phase, platform FROM posts_clean "

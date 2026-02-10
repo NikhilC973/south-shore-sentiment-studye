@@ -5,7 +5,7 @@ Maps 27 GoEmotions labels to 8 target emotions:
 fear, anger, sadness, joy, surprise, disgust, gratitude, pride.
 """
 import pandas as pd
-from src.utils.db import get_connection
+from src.utils.db import get_connection, init_database
 from src.utils.constants import PROJECT_ROOT, GOEMOTIONS_MAP, TARGET_EMOTIONS
 from src.utils.logger import log
 
@@ -56,6 +56,7 @@ def determine_dominant(scores: dict, threshold: float = 0.3) -> tuple[str, float
 
 def run_emotion_analysis():
     log.info("Starting GoEmotions analysis")
+    init_database()
     conn = get_connection()
     df = conn.execute(
         "SELECT id, text_clean FROM posts_clean WHERE is_duplicate=false AND quality_flag='ok'"

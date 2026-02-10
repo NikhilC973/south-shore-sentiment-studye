@@ -9,6 +9,46 @@ from src.utils.logger import log
 
 DB_PATH = PROJECT_ROOT / "data" / "sentiment_study.duckdb"
 
+# Expected columns for posts_clean (for migration when table exists with older schema)
+POSTS_CLEAN_COLUMNS = [
+    ("id", "VARCHAR PRIMARY KEY"),
+    ("platform", "VARCHAR"),
+    ("source", "VARCHAR"),
+    ("dt_utc", "TIMESTAMP WITH TIME ZONE"),
+    ("text_original", "VARCHAR"),
+    ("text_clean", "VARCHAR"),
+    ("text_tokens", "VARCHAR[]"),
+    ("text_lemmas", "VARCHAR[]"),
+    ("word_count", "INTEGER"),
+    ("phase", "VARCHAR"),
+    ("neighborhoods", "VARCHAR[]"),
+    ("has_geo", "BOOLEAN DEFAULT false"),
+    ("is_duplicate", "BOOLEAN DEFAULT false"),
+    ("quality_flag", "VARCHAR DEFAULT 'ok'"),
+]
+
+
+def _ensure_posts_clean_columns(conn: duckdb.DuckDBPyConnection) -> None:
+    """Add missing columns to posts_clean for DBs created with an older schema."""
+    try:
+        existing = set(
+            row[0]
+            for row in conn.execute(
+                "SELECT column_name FROM information_schema.columns WHERE table_name = 'posts_clean'"
+            ).fetchall()
+        )
+    except Exception:
+        return
+    for col_name, col_def in POSTS_CLEAN_COLUMNS:
+        if col_name in existing:
+            continue
+        try:
+            # PRIMARY KEY only on initial CREATE; use plain type when adding
+            spec = col_def.replace(" PRIMARY KEY", "") if "PRIMARY KEY" in col_def else col_def
+            conn.execute(f"ALTER TABLE posts_clean ADD COLUMN {col_name} {spec}")
+        except Exception:
+            pass
+
 
 def get_connection(db_path: Path | str | None = None) -> duckdb.DuckDBPyConnection:
     """Get a DuckDB connection. Creates the file if it doesn't exist."""
@@ -101,6 +141,9 @@ def init_database(db_path: Path | str | None = None) -> None:
             top_terms       VARCHAR[]
         );
     """)
+
+    # Migrate posts_clean if it was created with an older schema (missing is_duplicate, quality_flag, etc.)
+    _ensure_posts_clean_columns(conn)
 
     # Convenience view joining all tables
     conn.execute("""

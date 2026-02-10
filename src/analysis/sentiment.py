@@ -7,7 +7,7 @@ RoBERTa: Transformer-based sentiment (positive/negative/neutral) fine-tuned on s
 import numpy as np
 import pandas as pd
 
-from src.utils.db import get_connection
+from src.utils.db import get_connection, init_database
 from src.utils.constants import PROJECT_ROOT
 from src.utils.logger import log
 
@@ -103,6 +103,7 @@ def run_sentiment_analysis():
     """Run full sentiment scoring on posts_clean → posts_emotions (partial)."""
     log.info("📊 Starting sentiment analysis (VADER + RoBERTa)")
 
+    init_database()
     conn = get_connection()
 
     # Load clean posts
