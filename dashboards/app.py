@@ -3,7 +3,12 @@ South Shore Sentiment Study — Interactive Streamlit Dashboard
 Tabs: Overview | Themes | Geography | Methodology | Program Guidance
 """
 
+import sys
 from pathlib import Path
+
+# Add project root to Python path so src imports work
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(PROJECT_ROOT))
 
 import pandas as pd
 import streamlit as st
@@ -20,8 +25,6 @@ from src.visualization.geo_charts import (
     create_neighborhood_chart,
 )
 from src.visualization.topic_charts import create_topic_distribution_chart
-
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 st.set_page_config(page_title="South Shore Sentiment Study", page_icon="🏘️", layout="wide")
 
