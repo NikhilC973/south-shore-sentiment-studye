@@ -10,7 +10,7 @@ env/
 dist/
 build/
 
-# Data (keep structure, not contents)
+# Data
 data/raw/*
 data/processed/*
 data/synthetic/*
