@@ -15,7 +15,6 @@ data/raw/*
 data/processed/*
 data/synthetic/*
 data/exports/*
-data/*.duckdb
 data/*.duckdb.wal
 !data/raw/.gitkeep
 !data/processed/.gitkeep
