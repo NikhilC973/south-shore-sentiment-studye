@@ -4,11 +4,9 @@ Sentiment Analysis — VADER baseline + RoBERTa fine-tuned model.
 VADER: Fast, lexicon-based polarity scoring.
 RoBERTa: Transformer-based sentiment (positive/negative/neutral) fine-tuned on social media.
 """
-import numpy as np
-import pandas as pd
 
-from src.utils.db import get_connection, init_database
 from src.utils.constants import PROJECT_ROOT
+from src.utils.db import get_connection, init_database
 from src.utils.logger import log
 
 # Lazy imports for heavy ML libraries
@@ -21,6 +19,7 @@ def _get_vader():
     global _vader_analyzer
     if _vader_analyzer is None:
         from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+
         _vader_analyzer = SentimentIntensityAnalyzer()
         log.info("VADER analyzer loaded")
     return _vader_analyzer
@@ -31,6 +30,7 @@ def _get_roberta():
     global _roberta_pipeline
     if _roberta_pipeline is None:
         from transformers import pipeline
+
         _roberta_pipeline = pipeline(
             "sentiment-analysis",
             model="cardiffnlp/twitter-roberta-base-sentiment-latest",
@@ -64,9 +64,11 @@ def score_roberta_batch(texts: list[str], batch_size: int = 32) -> list[dict]:
     results = []
 
     for i in range(0, len(texts), batch_size):
-        batch = texts[i:i + batch_size]
+        batch = texts[i : i + batch_size]
         # Clean empty texts
-        batch_clean = [t if t and isinstance(t, str) and len(t.strip()) > 0 else "neutral" for t in batch]
+        batch_clean = [
+            t if t and isinstance(t, str) and len(t.strip()) > 0 else "neutral" for t in batch
+        ]
 
         try:
             preds = pipe(batch_clean)
@@ -157,30 +159,47 @@ def run_sentiment_analysis():
 
     for _, row in df.iterrows():
         if row["id"] in existing_ids:
-            conn.execute("""
+            conn.execute(
+                """
                 UPDATE posts_emotions SET
                     vader_compound = ?, vader_positive = ?, vader_negative = ?, vader_neutral = ?,
                     roberta_positive = ?, roberta_negative = ?, roberta_neutral = ?,
                     sentiment_label = ?
                 WHERE id = ?
-            """, [
-                row["vader_compound"], row["vader_positive"], row["vader_negative"], row["vader_neutral"],
-                row["roberta_positive"], row["roberta_negative"], row["roberta_neutral"],
-                row["sentiment_label"], row["id"],
-            ])
+            """,
+                [
+                    row["vader_compound"],
+                    row["vader_positive"],
+                    row["vader_negative"],
+                    row["vader_neutral"],
+                    row["roberta_positive"],
+                    row["roberta_negative"],
+                    row["roberta_neutral"],
+                    row["sentiment_label"],
+                    row["id"],
+                ],
+            )
         else:
-            conn.execute("""
+            conn.execute(
+                """
                 INSERT INTO posts_emotions (
                     id, vader_compound, vader_positive, vader_negative, vader_neutral,
                     roberta_positive, roberta_negative, roberta_neutral,
                     sentiment_label
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, [
-                row["id"],
-                row["vader_compound"], row["vader_positive"], row["vader_negative"], row["vader_neutral"],
-                row["roberta_positive"], row["roberta_negative"], row["roberta_neutral"],
-                row["sentiment_label"],
-            ])
+            """,
+                [
+                    row["id"],
+                    row["vader_compound"],
+                    row["vader_positive"],
+                    row["vader_negative"],
+                    row["vader_neutral"],
+                    row["roberta_positive"],
+                    row["roberta_negative"],
+                    row["roberta_neutral"],
+                    row["sentiment_label"],
+                ],
+            )
 
     # Export
     processed_dir = PROJECT_ROOT / "data" / "processed"
@@ -190,7 +209,7 @@ def run_sentiment_analysis():
     # Stats
     label_dist = df["sentiment_label"].value_counts().to_dict()
     avg_compound = df["vader_compound"].mean()
-    log.info(f"✅ Sentiment analysis complete")
+    log.info("✅ Sentiment analysis complete")
     log.info(f"   Label distribution: {label_dist}")
     log.info(f"   Mean VADER compound: {avg_compound:.3f}")
 

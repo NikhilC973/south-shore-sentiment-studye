@@ -8,16 +8,16 @@ neighborhood mentions that follow expected sentiment trajectories.
 Updated: Extended to 7 phases through Dec 12, 2025 (building vacated).
 Templates informed by Block Club Chicago verified reporting.
 """
+
 import hashlib
 import random
 from datetime import datetime, timedelta, timezone
-from typing import Generator
 
 from src.utils.constants import (
-    PHASES, SUBREDDITS, NEIGHBORHOOD_LEXICON, PLATFORMS,
+    NEIGHBORHOOD_LEXICON,
+    PHASES,
 )
 from src.utils.logger import log
-
 
 # ── Template Banks by Phase ──────────────────────────────────
 # These templates simulate realistic discourse; NO real posts are reproduced.
@@ -193,38 +193,102 @@ TEMPLATES = {
 # ── Emotion Profiles by Phase ────────────────────────────────
 # Expected emotional distribution (probabilities) per phase
 EMOTION_PROFILES = {
-    "pre": {"fear": 0.35, "anger": 0.15, "sadness": 0.10, "joy": 0.05,
-            "surprise": 0.10, "disgust": 0.05, "gratitude": 0.10, "pride": 0.10},
-    "event": {"fear": 0.40, "anger": 0.30, "sadness": 0.15, "joy": 0.01,
-              "surprise": 0.08, "disgust": 0.04, "gratitude": 0.01, "pride": 0.01},
-    "post_week1": {"fear": 0.15, "anger": 0.30, "sadness": 0.15, "joy": 0.05,
-                   "surprise": 0.05, "disgust": 0.05, "gratitude": 0.15, "pride": 0.10},
-    "post_week2": {"fear": 0.08, "anger": 0.15, "sadness": 0.10, "joy": 0.15,
-                   "surprise": 0.05, "disgust": 0.02, "gratitude": 0.25, "pride": 0.20},
-    "post_weeks3_5": {"fear": 0.05, "anger": 0.10, "sadness": 0.08, "joy": 0.15,
-                      "surprise": 0.05, "disgust": 0.02, "gratitude": 0.25, "pride": 0.30},
-    "court_action": {"fear": 0.10, "anger": 0.25, "sadness": 0.20, "joy": 0.03,
-                     "surprise": 0.05, "disgust": 0.07, "gratitude": 0.15, "pride": 0.15},
-    "displacement": {"fear": 0.15, "anger": 0.30, "sadness": 0.30, "joy": 0.02,
-                     "surprise": 0.03, "disgust": 0.08, "gratitude": 0.07, "pride": 0.05},
+    "pre": {
+        "fear": 0.35,
+        "anger": 0.15,
+        "sadness": 0.10,
+        "joy": 0.05,
+        "surprise": 0.10,
+        "disgust": 0.05,
+        "gratitude": 0.10,
+        "pride": 0.10,
+    },
+    "event": {
+        "fear": 0.40,
+        "anger": 0.30,
+        "sadness": 0.15,
+        "joy": 0.01,
+        "surprise": 0.08,
+        "disgust": 0.04,
+        "gratitude": 0.01,
+        "pride": 0.01,
+    },
+    "post_week1": {
+        "fear": 0.15,
+        "anger": 0.30,
+        "sadness": 0.15,
+        "joy": 0.05,
+        "surprise": 0.05,
+        "disgust": 0.05,
+        "gratitude": 0.15,
+        "pride": 0.10,
+    },
+    "post_week2": {
+        "fear": 0.08,
+        "anger": 0.15,
+        "sadness": 0.10,
+        "joy": 0.15,
+        "surprise": 0.05,
+        "disgust": 0.02,
+        "gratitude": 0.25,
+        "pride": 0.20,
+    },
+    "post_weeks3_5": {
+        "fear": 0.05,
+        "anger": 0.10,
+        "sadness": 0.08,
+        "joy": 0.15,
+        "surprise": 0.05,
+        "disgust": 0.02,
+        "gratitude": 0.25,
+        "pride": 0.30,
+    },
+    "court_action": {
+        "fear": 0.10,
+        "anger": 0.25,
+        "sadness": 0.20,
+        "joy": 0.03,
+        "surprise": 0.05,
+        "disgust": 0.07,
+        "gratitude": 0.15,
+        "pride": 0.15,
+    },
+    "displacement": {
+        "fear": 0.15,
+        "anger": 0.30,
+        "sadness": 0.30,
+        "joy": 0.02,
+        "surprise": 0.03,
+        "disgust": 0.08,
+        "gratitude": 0.07,
+        "pride": 0.05,
+    },
 }
 
 # ── Temporal Distribution ────────────────────────────────────
 PHASE_POST_WEIGHTS = {
-    "pre": 0.12,            # Moderate baseline chatter
-    "event": 0.22,          # Spike during raid
-    "post_week1": 0.20,     # High aftermath volume
-    "post_week2": 0.14,     # Declining but significant
+    "pre": 0.12,  # Moderate baseline chatter
+    "event": 0.22,  # Spike during raid
+    "post_week1": 0.20,  # High aftermath volume
+    "post_week2": 0.14,  # Declining but significant
     "post_weeks3_5": 0.12,  # Extended tail
-    "court_action": 0.12,   # Renewed attention with court
-    "displacement": 0.08,   # Final phase — smaller but intense
+    "court_action": 0.12,  # Renewed attention with court
+    "displacement": 0.08,  # Final phase — smaller but intense
 }
 
 SUBREDDIT_WEIGHTS = {
-    "Chicago": 0.30, "news": 0.15, "Illinois": 0.10, "politics": 0.10,
-    "AskChicago": 0.08, "EyesOnIce": 0.07, "moderatepolitics": 0.05,
-    "WindyCity": 0.05, "ICE_Raids": 0.04, "AskConservatives": 0.03,
-    "somethingiswrong2024": 0.02, "50501Chicago": 0.01,
+    "Chicago": 0.30,
+    "news": 0.15,
+    "Illinois": 0.10,
+    "politics": 0.10,
+    "AskChicago": 0.08,
+    "EyesOnIce": 0.07,
+    "moderatepolitics": 0.05,
+    "WindyCity": 0.05,
+    "ICE_Raids": 0.04,
+    "AskConservatives": 0.03,
+    "somethingiswrong2024": 0.02,
+    "50501Chicago": 0.01,
 }
 
 
@@ -251,7 +315,7 @@ def _add_neighborhood_mentions(text: str, rng: random.Random) -> tuple[str, list
     if not detected and rng.random() < 0.4:
         neighborhood = rng.choice(list(NEIGHBORHOOD_LEXICON.keys()))
         terms = NEIGHBORHOOD_LEXICON[neighborhood]
-        mention = rng.choice(terms)
+        # mention = rng.choice(terms)
         detected.append(neighborhood)
         # Don't modify the text; just tag it
 
@@ -303,7 +367,13 @@ def generate_synthetic_data(
                 # Add some variation
                 variations = [
                     lambda t: t,
-                    lambda t: t + " " + rng.choice(["smh", "unreal", "this is insane", "stay safe everyone", "prayers up"]),
+                    lambda t: (
+                        t
+                        + " "
+                        + rng.choice(
+                            ["smh", "unreal", "this is insane", "stay safe everyone", "prayers up"]
+                        )
+                    ),
                     lambda t: "Just saw this: " + t.lower(),
                     lambda t: t + " What are we supposed to do?",
                     lambda t: "Can confirm. " + t,
@@ -312,47 +382,69 @@ def generate_synthetic_data(
                 text = rng.choice(variations)(text)
 
                 source = rng.choices(sub_names, weights=sub_weights)[0]
-                post_type = rng.choice(["submission", "comment", "comment", "comment"])  # 75% comments
+                post_type = rng.choice(
+                    ["submission", "comment", "comment", "comment"]
+                )  # 75% comments
             else:
                 text = rng.choice(templates_news)
-                source = rng.choice(["Block Club Chicago", "WBEZ", "Chicago Sun-Times",
-                                      "South Side Weekly", "AP News"])
+                source = rng.choice(
+                    [
+                        "Block Club Chicago",
+                        "WBEZ",
+                        "Chicago Sun-Times",
+                        "South Side Weekly",
+                        "AP News",
+                    ]
+                )
                 post_type = rng.choice(["article", "comment", "comment", "comment"])
 
             dt = _random_datetime_in_phase(phase, rng)
             text, neighborhoods = _add_neighborhood_mentions(text, rng)
 
-            post_id = hashlib.md5(f"{phase}_{i}_{text[:30]}_{dt.isoformat()}".encode()).hexdigest()[:16]
+            post_id = hashlib.md5(f"{phase}_{i}_{text[:30]}_{dt.isoformat()}".encode()).hexdigest()[
+                :16
+            ]
 
-            posts.append({
-                "id": f"syn_{post_id}",
-                "platform": platform,
-                "source": source,
-                "url": f"https://synthetic.example.com/{post_id}",
-                "dt_utc": dt.isoformat(),
-                "text": text,
-                "title": text[:60] + "..." if post_type in ("submission", "article") else None,
-                "author_display": f"user_{rng.randint(1000, 9999)}",
-                "score": rng.randint(-5, 500) if platform == "reddit" else 0,
-                "like_count": rng.randint(0, 200),
-                "reply_count": rng.randint(0, 50),
-                "share_count": rng.randint(0, 20),
-                "parent_id": f"syn_parent_{rng.randint(1, 1000)}" if post_type == "comment" else None,
-                "post_type": post_type,
-                "detected_locs": neighborhoods,
-                "anchors": phase,
-                "search_term": rng.choice([
-                    "South Shore ICE", "Chicago ICE raid", "Operation Midway Blitz",
-                    "South Shore raid", "ICE raid Chicago apartment",
-                    "South Shore tenants union", "7500 South Shore Drive",
-                ]),
-            })
+            posts.append(
+                {
+                    "id": f"syn_{post_id}",
+                    "platform": platform,
+                    "source": source,
+                    "url": f"https://synthetic.example.com/{post_id}",
+                    "dt_utc": dt.isoformat(),
+                    "text": text,
+                    "title": text[:60] + "..." if post_type in ("submission", "article") else None,
+                    "author_display": f"user_{rng.randint(1000, 9999)}",
+                    "score": rng.randint(-5, 500) if platform == "reddit" else 0,
+                    "like_count": rng.randint(0, 200),
+                    "reply_count": rng.randint(0, 50),
+                    "share_count": rng.randint(0, 20),
+                    "parent_id": f"syn_parent_{rng.randint(1, 1000)}"
+                    if post_type == "comment"
+                    else None,
+                    "post_type": post_type,
+                    "detected_locs": neighborhoods,
+                    "anchors": phase,
+                    "search_term": rng.choice(
+                        [
+                            "South Shore ICE",
+                            "Chicago ICE raid",
+                            "Operation Midway Blitz",
+                            "South Shore raid",
+                            "ICE raid Chicago apartment",
+                            "South Shore tenants union",
+                            "7500 South Shore Drive",
+                        ]
+                    ),
+                }
+            )
 
     rng.shuffle(posts)
     log.info(f"Generated {len(posts)} synthetic posts across {len(PHASES)} phases")
 
     # Log distribution
     from collections import Counter
+
     phase_dist = Counter(p["anchors"] for p in posts)
     platform_dist = Counter(p["platform"] for p in posts)
     log.info(f"Phase distribution: {dict(phase_dist)}")
@@ -363,6 +455,7 @@ def generate_synthetic_data(
 
 if __name__ == "__main__":
     import json
+
     posts = generate_synthetic_data(n_posts=3500)
     print(f"Generated {len(posts)} posts")
     print(json.dumps(posts[0], indent=2, default=str))

@@ -4,9 +4,9 @@ GoEmotions Multi-Label Emotion Analysis.
 Maps 27 GoEmotions labels to 8 target emotions:
 fear, anger, sadness, joy, surprise, disgust, gratitude, pride.
 """
-import pandas as pd
+
+from src.utils.constants import GOEMOTIONS_MAP, PROJECT_ROOT, TARGET_EMOTIONS
 from src.utils.db import get_connection, init_database
-from src.utils.constants import PROJECT_ROOT, GOEMOTIONS_MAP, TARGET_EMOTIONS
 from src.utils.logger import log
 
 _emotion_pipeline = None
@@ -16,11 +16,14 @@ def _get_pipeline():
     global _emotion_pipeline
     if _emotion_pipeline is None:
         from transformers import pipeline
+
         _emotion_pipeline = pipeline(
             "text-classification",
             model="monologg/bert-base-cased-goemotions-original",
             tokenizer="monologg/bert-base-cased-goemotions-original",
-            max_length=512, truncation=True, top_k=None,
+            max_length=512,
+            truncation=True,
+            top_k=None,
         )
         log.info("GoEmotions pipeline loaded")
     return _emotion_pipeline
@@ -30,7 +33,10 @@ def score_emotions_batch(texts: list[str], batch_size: int = 32) -> list[dict]:
     pipe = _get_pipeline()
     results = []
     for i in range(0, len(texts), batch_size):
-        batch = [t if t and isinstance(t, str) and len(t.strip()) > 0 else "neutral" for t in texts[i:i+batch_size]]
+        batch = [
+            t if t and isinstance(t, str) and len(t.strip()) > 0 else "neutral"
+            for t in texts[i : i + batch_size]
+        ]
         try:
             preds = pipe(batch)
             for pred in preds:
@@ -63,7 +69,9 @@ def run_emotion_analysis():
     ).fetchdf()
 
     if df.empty:
-        log.warning("No posts to analyze"); conn.close(); return
+        log.warning("No posts to analyze")
+        conn.close()
+        return
 
     log.info(f"Scoring {len(df)} posts")
     try:
@@ -71,14 +79,15 @@ def run_emotion_analysis():
     except Exception as e:
         log.error(f"GoEmotions failed: {e}. Using VADER fallback.")
         from src.analysis.sentiment import score_vader
+
         emo_scores = []
         for t in df["text_clean"]:
             v = score_vader(t)["compound"]
             s = {e: 0.0 for e in TARGET_EMOTIONS}
             if v < -0.3:
-                s["fear"], s["anger"], s["sadness"] = abs(v)*0.5, abs(v)*0.3, abs(v)*0.2
+                s["fear"], s["anger"], s["sadness"] = abs(v) * 0.5, abs(v) * 0.3, abs(v) * 0.2
             elif v > 0.3:
-                s["joy"], s["gratitude"], s["pride"] = v*0.4, v*0.3, v*0.3
+                s["joy"], s["gratitude"], s["pride"] = v * 0.4, v * 0.3, v * 0.3
             emo_scores.append(s)
 
     for emo in TARGET_EMOTIONS:
@@ -88,22 +97,30 @@ def run_emotion_analysis():
     df["dominant_emotion"] = [d[0] for d in dominant]
     df["emotion_confidence"] = [d[1] for d in dominant]
 
-    existing = set(conn.execute("SELECT id FROM posts_emotions").fetchdf()["id"]) if \
-        conn.execute("SELECT COUNT(*) FROM posts_emotions").fetchone()[0] > 0 else set()
+    existing = (
+        set(conn.execute("SELECT id FROM posts_emotions").fetchdf()["id"])
+        if conn.execute("SELECT COUNT(*) FROM posts_emotions").fetchone()[0] > 0
+        else set()
+    )
 
     for _, r in df.iterrows():
-        vals = [r[f"emo_{e}"] for e in TARGET_EMOTIONS] + [r["dominant_emotion"], r["emotion_confidence"]]
+        vals = [r[f"emo_{e}"] for e in TARGET_EMOTIONS] + [
+            r["dominant_emotion"],
+            r["emotion_confidence"],
+        ]
         if r["id"] in existing:
             conn.execute(
                 f"UPDATE posts_emotions SET {', '.join(f'emo_{e}=?' for e in TARGET_EMOTIONS)}, "
                 "dominant_emotion=?, emotion_confidence=? WHERE id=?",
-                vals + [r["id"]]
+                vals + [r["id"]],
             )
         else:
             conn.execute(
                 f"INSERT INTO posts_emotions (id, {', '.join(f'emo_{e}' for e in TARGET_EMOTIONS)}, "
-                "dominant_emotion, emotion_confidence) VALUES (?" + ", ?" * (len(TARGET_EMOTIONS)+2) + ")",
-                [r["id"]] + vals
+                "dominant_emotion, emotion_confidence) VALUES (?"
+                + ", ?" * (len(TARGET_EMOTIONS) + 2)
+                + ")",
+                [r["id"]] + vals,
             )
 
     out = PROJECT_ROOT / "data" / "processed"

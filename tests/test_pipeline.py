@@ -1,7 +1,7 @@
 """
 Tests for the ingestion pipeline.
 """
-import pytest
+
 from src.ingestion.synthetic_generator import generate_synthetic_data
 from src.utils.constants import PHASES
 

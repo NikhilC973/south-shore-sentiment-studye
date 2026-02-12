@@ -3,21 +3,24 @@ Text Cleaning Pipeline — Normalization, deduplication, and phase tagging.
 
 Updated: Extended phase detection to 7 phases (through Dec 12, 2025).
 """
-import re
+
 import hashlib
+import re
 from datetime import datetime
 
 import duckdb
 import pandas as pd
 
 from src.utils.constants import (
-    DATA_DIR, PHASES, TABLE_POSTS_RAW, TABLE_POSTS_CLEAN,
+    PHASES,
+    TABLE_POSTS_CLEAN,
+    TABLE_POSTS_RAW,
 )
 from src.utils.db import get_connection
 from src.utils.logger import log
 
-
 # ── Text Cleaning ────────────────────────────────────────────
+
 
 def clean_text(text: str) -> str:
     """Normalize a post's text for NLP processing."""
@@ -69,6 +72,7 @@ def compute_text_hash(text: str) -> str:
 
 
 # ── Main Pipeline ────────────────────────────────────────────
+
 
 def run_cleaning():
     """Execute the full cleaning pipeline."""

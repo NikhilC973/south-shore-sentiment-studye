@@ -1,9 +1,13 @@
 """
 Tests for the cleaning pipeline.
 """
-import pytest
+
 from src.analysis.cleaning import (
-    clean_text, tokenize_simple, detect_phase, detect_neighborhoods, flag_quality,
+    clean_text,
+    detect_neighborhoods,
+    detect_phase,
+    flag_quality,
+    tokenize_simple,
 )
 
 

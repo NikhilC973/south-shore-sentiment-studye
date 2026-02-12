@@ -1,8 +1,9 @@
 """
 Structured logging for the South Shore Sentiment Study.
 """
+
 import logging
-import sys
+
 from rich.logging import RichHandler
 
 

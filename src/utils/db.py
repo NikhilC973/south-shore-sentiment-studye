@@ -1,17 +1,21 @@
 """
 DuckDB connection manager and schema initialization.
 """
+
 import os
-import duckdb
 from pathlib import Path
+
+import duckdb
+
 from src.utils.constants import PROJECT_ROOT
 from src.utils.logger import log
-
 
 DB_PATH = PROJECT_ROOT / "data" / "sentiment_study.duckdb"
 
 # Detect Streamlit Cloud (read-only filesystem)
-IS_STREAMLIT_CLOUD = os.path.exists("/mount/src") or os.environ.get("STREAMLIT_SERVER_HEADLESS") == "true"
+IS_STREAMLIT_CLOUD = (
+    os.path.exists("/mount/src") or os.environ.get("STREAMLIT_SERVER_HEADLESS") == "true"
+)
 
 # Expected columns for posts_clean (for migration when table exists with older schema)
 POSTS_CLEAN_COLUMNS = [

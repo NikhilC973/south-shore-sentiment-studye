@@ -4,17 +4,16 @@ Ingestion Pipeline Orchestrator.
 Orchestrates data collection from all sources, normalizes to common schema,
 deduplicates, and stores to DuckDB + Parquet.
 """
+
 import argparse
-import sys
-from pathlib import Path
 
 import pandas as pd
 
-from src.ingestion.reddit_collector import collect_reddit_data
 from src.ingestion.news_collector import NewsCollector
+from src.ingestion.reddit_collector import collect_reddit_data
 from src.ingestion.synthetic_generator import generate_synthetic_data
-from src.utils.db import get_connection, init_database
 from src.utils.constants import PROJECT_ROOT
+from src.utils.db import get_connection, init_database
 from src.utils.logger import log
 
 
@@ -78,9 +77,23 @@ def store_to_db(df: pd.DataFrame) -> None:
 
     # Ensure columns match schema
     expected_cols = [
-        "id", "platform", "source", "url", "dt_utc", "text", "title",
-        "author_display", "score", "like_count", "reply_count", "share_count",
-        "parent_id", "post_type", "detected_locs", "anchors", "search_term",
+        "id",
+        "platform",
+        "source",
+        "url",
+        "dt_utc",
+        "text",
+        "title",
+        "author_display",
+        "score",
+        "like_count",
+        "reply_count",
+        "share_count",
+        "parent_id",
+        "post_type",
+        "detected_locs",
+        "anchors",
+        "search_term",
     ]
 
     for col in expected_cols:
@@ -160,10 +173,15 @@ def run_pipeline(mode: str = "synthetic", n_posts: int = 2500):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="South Shore Sentiment Study — Data Ingestion")
-    parser.add_argument("--mode", choices=["live", "synthetic", "both"], default="synthetic",
-                        help="Collection mode: live, synthetic, or both")
-    parser.add_argument("--n-posts", type=int, default=2500,
-                        help="Number of synthetic posts to generate")
+    parser.add_argument(
+        "--mode",
+        choices=["live", "synthetic", "both"],
+        default="synthetic",
+        help="Collection mode: live, synthetic, or both",
+    )
+    parser.add_argument(
+        "--n-posts", type=int, default=2500, help="Number of synthetic posts to generate"
+    )
     args = parser.parse_args()
 
     run_pipeline(mode=args.mode, n_posts=args.n_posts)

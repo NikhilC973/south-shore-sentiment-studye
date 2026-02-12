@@ -4,16 +4,17 @@ News Comment Collector — Scrapes public comment sections from Chicago news sit
 Targets: Block Club Chicago, WBEZ, Chicago Sun-Times, South Side Weekly, AP News.
 Approach: BeautifulSoup + requests with respectful rate limiting and robots.txt compliance.
 """
+
 import hashlib
 import re
 import time
 from datetime import datetime, timezone
 from typing import Generator
-from urllib.parse import urljoin, quote_plus
+from urllib.parse import quote_plus, urljoin
 
 import requests
 from bs4 import BeautifulSoup
-from src.utils.constants import SEARCH_TERMS
+
 from src.utils.logger import log
 
 
@@ -154,8 +155,13 @@ class NewsCollector:
 
         dt = None
         if date_str:
-            for fmt in ["%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%dT%H:%M:%S.%f%z",
-                        "%Y-%m-%d", "%B %d, %Y", "%b %d, %Y"]:
+            for fmt in [
+                "%Y-%m-%dT%H:%M:%S%z",
+                "%Y-%m-%dT%H:%M:%S.%f%z",
+                "%Y-%m-%d",
+                "%B %d, %Y",
+                "%b %d, %Y",
+            ]:
                 try:
                     dt = datetime.strptime(date_str.strip()[:25], fmt)
                     if dt.tzinfo is None:
@@ -168,7 +174,9 @@ class NewsCollector:
 
         # Article body text (for context, not published verbatim)
         article_text = ""
-        for tag in soup.find_all(["article", "div"], class_=re.compile(r"entry-content|article-body|story-body")):
+        for tag in soup.find_all(
+            ["article", "div"], class_=re.compile(r"entry-content|article-body|story-body")
+        ):
             article_text = " ".join(p.get_text(strip=True) for p in tag.find_all("p"))
             if article_text:
                 break
@@ -183,10 +191,12 @@ class NewsCollector:
             for el in soup.select(selector):
                 text = el.get_text(strip=True)
                 if text and len(text) > 10:
-                    comments.append({
-                        "text": text,
-                        "author": "anonymous",
-                    })
+                    comments.append(
+                        {
+                            "text": text,
+                            "author": "anonymous",
+                        }
+                    )
 
         # Also try common Disqus / comment-list patterns
         for comment_block in soup.select(".comment, .dsq-comment, [data-comment-id]"):
@@ -208,7 +218,9 @@ class NewsCollector:
 
         return unique
 
-    def collect_from_source(self, source: dict, queries: list[str] | None = None) -> Generator[dict, None, None]:
+    def collect_from_source(
+        self, source: dict, queries: list[str] | None = None
+    ) -> Generator[dict, None, None]:
         """Collect comments from a single news source."""
         if not self._check_robots(source["domain"]):
             log.warning(f"Skipping {source['name']} due to robots.txt")
@@ -263,7 +275,9 @@ class NewsCollector:
 
                     # Yield comments
                     for i, comment in enumerate(comments):
-                        comment_id = hashlib.md5(f"{url}_{i}_{comment['text'][:50]}".encode()).hexdigest()[:12]
+                        comment_id = hashlib.md5(
+                            f"{url}_{i}_{comment['text'][:50]}".encode()
+                        ).hexdigest()[:12]
                         yield {
                             "id": f"news_com_{comment_id}",
                             "platform": "news_comment",
@@ -305,6 +319,7 @@ class NewsCollector:
 
 if __name__ == "__main__":
     import json
+
     collector = NewsCollector()
     posts = collector.collect_all()
     print(f"Collected {len(posts)} news items")

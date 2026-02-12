@@ -2,14 +2,13 @@
 Verified Events Loader — Loads journalist-verified event timeline
 from config/verified_events.yaml for use in visualizations and reports.
 """
-from pathlib import Path
+
 from typing import Optional
 
 import yaml
 
 from src.utils.constants import CONFIG_DIR
 from src.utils.logger import log
-
 
 _CACHE: Optional[dict] = None
 
@@ -59,10 +58,7 @@ def get_key_entities() -> dict:
 
 def get_events_for_phase(phase_name: str) -> list[dict]:
     """Get verified events that impacted a specific phase."""
-    return [
-        e for e in get_timeline_events()
-        if e.get("phase_impact") == phase_name
-    ]
+    return [e for e in get_timeline_events() if e.get("phase_impact") == phase_name]
 
 
 if __name__ == "__main__":

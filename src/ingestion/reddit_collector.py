@@ -8,6 +8,7 @@ Strategy (elite approach after API rejection):
 
 All methods use public, legal access points with respectful rate limiting.
 """
+
 import hashlib
 import json
 import time
@@ -15,9 +16,12 @@ from datetime import datetime, timezone
 from typing import Generator
 
 import requests
+
 from src.utils.constants import (
-    SUBREDDITS, SEARCH_TERMS,
-    COLLECTION_START, COLLECTION_END, EXTENDED_END,
+    COLLECTION_START,
+    EXTENDED_END,
+    SEARCH_TERMS,
+    SUBREDDITS,
 )
 from src.utils.logger import log
 
@@ -46,6 +50,7 @@ class PullPushCollector:
       - /reddit/search/submission/  (posts)
       - /reddit/search/comment/     (comments)
     """
+
     BASE_URL = "https://api.pullpush.io/reddit"
     HEADERS = {
         "User-Agent": "SouthShoreSentimentStudy/1.0 (Academic Research; Contact: study@example.com)"
@@ -210,8 +215,10 @@ class PullPushCollector:
             for sub in subs:
                 # Submissions
                 for item in self.search_submissions(
-                    query=term, subreddit=sub,
-                    after_epoch=after_epoch, before_epoch=before_epoch,
+                    query=term,
+                    subreddit=sub,
+                    after_epoch=after_epoch,
+                    before_epoch=before_epoch,
                     size=100,
                 ):
                     normalized = self._normalize_submission(item)
@@ -222,8 +229,10 @@ class PullPushCollector:
 
                 # Comments
                 for item in self.search_comments(
-                    query=term, subreddit=sub,
-                    after_epoch=after_epoch, before_epoch=before_epoch,
+                    query=term,
+                    subreddit=sub,
+                    after_epoch=after_epoch,
+                    before_epoch=before_epoch,
                     size=100,
                 ):
                     normalized = self._normalize_comment(item)
@@ -234,8 +243,10 @@ class PullPushCollector:
 
             # Also search without subreddit filter (broader sweep)
             for item in self.search_submissions(
-                query=term, subreddit=None,
-                after_epoch=after_epoch, before_epoch=before_epoch,
+                query=term,
+                subreddit=None,
+                after_epoch=after_epoch,
+                before_epoch=before_epoch,
                 size=100,
             ):
                 normalized = self._normalize_submission(item)
@@ -256,10 +267,9 @@ class OldRedditCollector:
     Limitations: Only recent/current posts, no deep historical search.
     Use for: supplementing PullPush gaps and getting fresh data.
     """
+
     BASE_URL = "https://old.reddit.com"
-    HEADERS = {
-        "User-Agent": "SouthShoreSentimentStudy/1.0 (Academic Research)"
-    }
+    HEADERS = {"User-Agent": "SouthShoreSentimentStudy/1.0 (Academic Research)"}
 
     def __init__(self, rate_limit: float = 2.5):
         self.limiter = RateLimiter(rate_limit)
@@ -331,7 +341,11 @@ class OldRedditCollector:
         dt = datetime.fromtimestamp(created_utc, tz=timezone.utc)
         is_comment = "body" in item
 
-        text = item.get("body", "") if is_comment else f"{item.get('title', '')} {item.get('selftext', '')}".strip()
+        text = (
+            item.get("body", "")
+            if is_comment
+            else f"{item.get('title', '')} {item.get('selftext', '')}".strip()
+        )
         post_id = f"reddit_{'com' if is_comment else 'sub'}_{item.get('id', 'unknown')}"
 
         return {

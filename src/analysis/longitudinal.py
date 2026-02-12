@@ -4,10 +4,12 @@ Longitudinal Analysis — Emotion trajectories over time with bootstrapped CIs.
 Computes daily/phase-level emotion means, confidence intervals, and
 platform contrasts for the visualization layer.
 """
-import pandas as pd
+
 import numpy as np
+import pandas as pd
+
+from src.utils.constants import PHASES, PROJECT_ROOT, TARGET_EMOTIONS
 from src.utils.db import get_connection
-from src.utils.constants import PROJECT_ROOT, TARGET_EMOTIONS, PHASES
 from src.utils.logger import log
 
 
@@ -92,7 +94,7 @@ def compute_geo_emotions(df: pd.DataFrame) -> pd.DataFrame:
     """Compute emotion scores by neighborhood."""
     rows = []
     # Explode neighborhoods for per-neighborhood analysis
-    geo_df = df[df["has_geo"] == True].copy()
+    geo_df = df[df["has_geo"]].copy()
     if "neighborhoods" in geo_df.columns:
         geo_df = geo_df.explode("neighborhoods")
         for hood, group in geo_df.groupby("neighborhoods"):
@@ -139,7 +141,7 @@ def run_longitudinal_analysis():
     daily_df.to_csv(out_dir / "daily_emotions.csv", index=False)
 
     log.info(f"✅ Longitudinal analysis complete. Exports in {out_dir}")
-    log.info(f"   Phase summary:\n{phase_df[['phase','n_posts']].to_string()}")
+    log.info(f"   Phase summary:\n{phase_df[['phase', 'n_posts']].to_string()}")
 
     return {"phase": phase_df, "daily": daily_df, "platform": platform_df, "geo": geo_df}
 
