@@ -6,21 +6,25 @@ Tabs: Overview | Themes | Geography | Methodology | Program Guidance
 import sys
 from pathlib import Path
 
-import pandas as pd
-import streamlit as st
+# Add project root to path before importing src modules
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(PROJECT_ROOT))
 
-from src.utils.constants import PHASES
-from src.visualization.emotion_curves import (
+import pandas as pd  # noqa: E402
+import streamlit as st  # noqa: E402
+
+from src.utils.constants import PHASES  # noqa: E402
+from src.visualization.emotion_curves import (  # noqa: E402
     create_emotion_trajectory_chart,
     create_phase_comparison_chart,
     create_platform_contrast_chart,
     create_sentiment_heatmap,
 )
-from src.visualization.geo_charts import create_geo_fear_timeline, create_neighborhood_chart
-from src.visualization.topic_charts import create_topic_distribution_chart
-
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(PROJECT_ROOT))
+from src.visualization.geo_charts import (  # noqa: E402
+    create_geo_fear_timeline,
+    create_neighborhood_chart,
+)
+from src.visualization.topic_charts import create_topic_distribution_chart  # noqa: E402
 
 st.set_page_config(page_title="South Shore Sentiment Study", page_icon="🏘️", layout="wide")
 
