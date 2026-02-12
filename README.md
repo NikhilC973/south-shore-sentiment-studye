@@ -112,65 +112,32 @@ Full verified timeline with 14 events: [`config/verified_events.yaml`](config/ve
 south-shore-sentiment-study/
 ├── .github/
 │   └── workflows/
-│       └── ci.yml                    # GitHub Actions CI
 ├── config/
-│   ├── settings.yaml                 # Central config (queries, thresholds, paths)
-│   ├── verified_events.yaml          # Block Club Chicago verified event timeline
-│   ├── source_registry.yaml          # Data source compliance registry
-│   └── .env.example                  # Environment template
 ├── data/
 │   ├── raw/                          # Immutable ingested data
 │   ├── processed/                    # Cleaned + enriched parquets
 │   ├── synthetic/                    # Generated synthetic fallback data
-│   └── exports/                      # Aggregated outputs for sharing
+│   └── exports/                     
 ├── docs/
 │   ├── ETHICS.md                     # Ethical use statement
 │   ├── METHODOLOGY.md                # Full methodology writeup
 │   ├── LIMITATIONS.md                # Known limitations
 │   ├── screenshots/                  # Dashboard screenshots
-│   └── report/                       # Final PDF report assets
+│   └── report/                 
 ├── src/
 │   ├── ingestion/
-│   │   ├── __init__.py
-│   │   ├── reddit_collector.py       # PullPush.io + Old Reddit JSON
-│   │   ├── news_collector.py         # News comment scraping
-│   │   ├── synthetic_generator.py    # Realistic synthetic data (7 phases)
-│   │   └── pipeline.py              # Orchestrator for all sources
 │   ├── analysis/
-│   │   ├── __init__.py
-│   │   ├── cleaning.py               # Text normalization + dedup + 7-phase tagging
-│   │   ├── sentiment.py              # VADER + RoBERTa scoring
-│   │   ├── emotions.py               # GoEmotions multi-label
-│   │   ├── topics.py                 # BERTopic modeling
-│   │   ├── geo_tagger.py             # Neighborhood mention extraction
-│   │   ├── phase_tagger.py           # Temporal phase assignment
-│   │   └── longitudinal.py           # Time-series analysis + CIs
 │   ├── visualization/
-│   │   ├── __init__.py
-│   │   ├── emotion_curves.py         # Plotly emotion trajectories
-│   │   ├── topic_charts.py           # BERTopic visualizations
-│   │   ├── geo_charts.py             # Neighborhood comparisons
-│   │   ├── guidance.py               # Program timing recommendations
-│   │   └── report_generator.py       # PDF report builder
 │   └── utils/
-│       ├── __init__.py
-│       ├── db.py                      # DuckDB connection manager
-│       ├── logger.py                  # Structured logging
-│       ├── constants.py               # Shared constants (7 phases)
-│       └── verified_events.py         # Event timeline loader
 ├── dashboards/
-│   └── app.py                        # Streamlit dashboard (6 tabs)
 ├── tests/
-│   ├── test_cleaning.py
-│   ├── test_sentiment.py
-│   └── test_pipeline.py
 ├── notebooks/
-│   └── 01_eda_exploration.ipynb
 ├── Makefile                          # Task runner
 ├── pyproject.toml                    # Modern Python packaging
 ├── requirements.txt                  # Pinned dependencies
 ├── LICENSE
 └── README.md
+
 ```
 
 ---
