@@ -159,9 +159,12 @@ cd south-shore-sentiment-study
 cp config/.env.example .env
 python -m venv .venv && source .venv/bin/activate
 
-# Install
-pip install -r requirements.txt
-python -m spacy download en_core_web_sm
+# Install (includes editable package installation)
+make install
+# Or manually:
+# pip install -r requirements.txt
+# pip install -e .  # Install package in editable mode
+# python -m spacy download en_core_web_sm
 
 # Initialize database
 make init-db
@@ -182,7 +185,11 @@ make report          # Generate PDF report
 make run-all         # Execute full pipeline end-to-end
 make test            # Run test suite
 make lint            # Code quality checks
+make format          # Auto-format code and fix linting issues
+make pre-commit-fix  # Format before committing (recommended before git commit)
 ```
+
+**Note on Commits:** If your commits fail due to pre-commit hooks modifying files, run `make pre-commit-fix` first, then commit again. This ensures all code is formatted before the pre-commit hooks run.
 
 ---
 

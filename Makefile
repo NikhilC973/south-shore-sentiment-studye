@@ -10,10 +10,11 @@ help: ## Show available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | \
 		awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
-install: ## Install dependencies
+install: ## Install dependencies and package in editable mode
 	pip install -r requirements.txt
+	pip install -e .  # Install package in editable mode so src imports work
 	$(PYTHON) -m spacy download en_core_web_sm
-	@echo "✅ Dependencies installed"
+	@echo "✅ Dependencies installed and package configured"
 
 init-db: ## Initialize DuckDB database
 	$(PYTHON) -c "from src.utils.db import init_database; init_database()"
@@ -57,5 +58,9 @@ lint: ## Code quality checks
 	ruff check src/ tests/ dashboards/
 	ruff format --check src/ tests/ dashboards/
 
-format: ## Auto-format code
+format: ## Auto-format code and fix linting issues
 	ruff format src/ tests/ dashboards/
+	ruff check --fix src/ tests/ dashboards/
+
+pre-commit-fix: format ## Run formatting/linting before committing (use this before git commit)
+	@echo "✅ Code formatted and linted. You can now commit."
