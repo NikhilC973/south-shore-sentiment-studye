@@ -245,16 +245,18 @@ The Streamlit dashboard includes:
 
 ## 📸 Dashboard Preview
 
+## 📸 Dashboard Preview (Live Output)
+
 ### 🏠 Home
 ![Home](docs/screenshots/Home.png)
 
 ---
 
 ### 📈 Overview — Emotion Trajectories
-![Overview 1](docs/screenshots/Overview_1.png)
-![Overview 2](docs/screenshots/Overview_2.png)
-![Overview 3](docs/screenshots/Overview_3.png)
-![Overview 4](docs/screenshots/Overview_4.png)
+![Overview 1](docs/screenshots/overview_1.png)
+![Overview 2](docs/screenshots/overview_2.png)
+![Overview 3](docs/screenshots/overview_3.png)
+![Overview 4](docs/screenshots/overview_4.png)
 
 ---
 
@@ -264,8 +266,8 @@ The Streamlit dashboard includes:
 ---
 
 ### 🌍 Geography Analysis
-![Geography 1](docs/screenshots/Geography_1.png)
-![Geography 2](docs/screenshots/Geography_2.png)
+![Geography 1](docs/screenshots/geography_1.png)
+![Geography 2](docs/screenshots/geography_2.png)
 
 ---
 
@@ -275,7 +277,8 @@ The Streamlit dashboard includes:
 ---
 
 ### 🎯 Program Guidance
-![Guidance](docs/screenshots/guidance.png)
+![Guidance](docs/screenshots/Guidance.png)
+
 
 
 ---
