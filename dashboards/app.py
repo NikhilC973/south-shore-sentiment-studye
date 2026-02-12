@@ -92,7 +92,7 @@ with tab3:
 with tab4:
     st.header("Methodology & Ethics")
     st.markdown("""
-    **Sources:** 12 subreddits + 5 news sites | **Window:** Sep 16 - Nov 7, 2025 | **NLP:** VADER + RoBERTa + GoEmotions + BERTopic
+    **Sources:** 12 subreddits + 5 news sites | **Window:** Sep 16 - Dec 12, 2025 | **NLP:** VADER + RoBERTa + GoEmotions + BERTopic
 
     **Verification:** L1 Official/FOIA → L2 Two-Source Media → L3 Single-Source → L4 Social
 
