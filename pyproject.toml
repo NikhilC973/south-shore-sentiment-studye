@@ -12,10 +12,7 @@ requires-python = ">=3.10"
 authors = [{name = "Sanju"}]
 
 [tool.setuptools]
-packages = ["src"]
-
-[tool.setuptools.package-dir]
-"" = "."
+packages = {find = {where = ".", include = ["src*"]}}
 
 [tool.ruff]
 line-length = 100
