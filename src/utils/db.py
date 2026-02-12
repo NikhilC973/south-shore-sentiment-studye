@@ -1,6 +1,7 @@
 """
 DuckDB connection manager and schema initialization.
 """
+import os
 import duckdb
 from pathlib import Path
 from src.utils.constants import PROJECT_ROOT
@@ -8,6 +9,9 @@ from src.utils.logger import log
 
 
 DB_PATH = PROJECT_ROOT / "data" / "sentiment_study.duckdb"
+
+# Detect Streamlit Cloud (read-only filesystem)
+IS_STREAMLIT_CLOUD = os.path.exists("/mount/src") or os.environ.get("STREAMLIT_SERVER_HEADLESS") == "true"
 
 # Expected columns for posts_clean (for migration when table exists with older schema)
 POSTS_CLEAN_COLUMNS = [
@@ -51,15 +55,24 @@ def _ensure_posts_clean_columns(conn: duckdb.DuckDBPyConnection) -> None:
 
 
 def get_connection(db_path: Path | str | None = None) -> duckdb.DuckDBPyConnection:
-    """Get a DuckDB connection. Creates the file if it doesn't exist."""
+    """Get a DuckDB connection. Opens read-only on Streamlit Cloud."""
     path = Path(db_path) if db_path else DB_PATH
-    path.parent.mkdir(parents=True, exist_ok=True)
-    conn = duckdb.connect(str(path))
+
+    if IS_STREAMLIT_CLOUD:
+        # Streamlit Cloud has a read-only filesystem; skip mkdir, open read-only
+        conn = duckdb.connect(str(path), read_only=True)
+    else:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        conn = duckdb.connect(str(path))
     return conn
 
 
 def init_database(db_path: Path | str | None = None) -> None:
     """Initialize database with all required tables."""
+    if IS_STREAMLIT_CLOUD:
+        log.info("☁️ Streamlit Cloud detected — skipping DB init (read-only)")
+        return
+
     conn = get_connection(db_path)
 
     conn.execute("""
@@ -178,6 +191,10 @@ def query_df(sql: str, db_path: Path | str | None = None):
 
 def execute(sql: str, params=None, db_path: Path | str | None = None):
     """Execute SQL statement."""
+    if IS_STREAMLIT_CLOUD:
+        log.warning("☁️ Write operation skipped on Streamlit Cloud (read-only)")
+        return
+
     conn = get_connection(db_path)
     try:
         if params:
