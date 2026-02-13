@@ -82,6 +82,11 @@ def create_emotion_trajectory_chart(daily_df, title="Emotion Trajectories Over T
     )
     fig.update_yaxes(title_text="Mean Probability", row=1, col=1)
     fig.update_yaxes(title_text="# Posts", row=2, col=1)
+    fig.update_layout(
+        paper_bgcolor="#0e1117",
+        plot_bgcolor="#0e1117",
+        legend=dict(bgcolor="#0e1117"),
+    )
     return fig
 
 
@@ -111,6 +116,11 @@ def create_phase_comparison_chart(phase_df):
     fig.update_layout(
         title="Emotion by Phase (95% CI)", barmode="group", template="plotly_dark", height=500
     )
+    fig.update_layout(
+        paper_bgcolor="#0e1117",
+        plot_bgcolor="#0e1117",
+        legend=dict(bgcolor="#0e1117"),
+    )
     return fig
 
 
@@ -133,6 +143,11 @@ def create_platform_contrast_chart(platform_df):
         polar=dict(radialaxis=dict(visible=True, range=[0, 0.5])),
         template="plotly_dark",
         height=500,
+    )
+    fig.update_layout(
+        paper_bgcolor="#0e1117",
+        plot_bgcolor="#0e1117",
+        legend=dict(bgcolor="#0e1117"),
     )
     return fig
 
@@ -160,4 +175,9 @@ def create_sentiment_heatmap(daily_df):
             line=dict(color=m["color"], width=1, dash="dash"),
         )
     fig.update_layout(title="Emotion Heatmap", template="plotly_dark", height=400)
+    fig.update_layout(
+        paper_bgcolor="#0e1117",
+        plot_bgcolor="#0e1117",
+        legend=dict(bgcolor="#0e1117"),
+    )
     return fig
