@@ -78,7 +78,7 @@ def create_emotion_trajectory_chart(daily_df, title="Emotion Trajectories Over T
         height=650,
         template="plotly_dark",
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-        hovermode="x unified",
+        hovermode="x",
         hoverlabel=dict(bgcolor="#0e1117", font=dict(color="white"), bordercolor="#333"),
     )
     fig.update_yaxes(title_text="Mean Probability", row=1, col=1)
