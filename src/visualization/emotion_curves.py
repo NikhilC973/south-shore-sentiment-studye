@@ -88,6 +88,7 @@ def create_emotion_trajectory_chart(daily_df, title="Emotion Trajectories Over T
         plot_bgcolor="#0e1117",
         legend=dict(bgcolor="#0e1117"),
     )
+    fig.update_traces(hoverlabel=dict(bgcolor="#0e1117", font_color="white", bordercolor="#333"))
     return fig
 
 
@@ -122,6 +123,7 @@ def create_phase_comparison_chart(phase_df):
         plot_bgcolor="#0e1117",
         legend=dict(bgcolor="#0e1117"),
     )
+    fig.update_traces(hoverlabel=dict(bgcolor="#0e1117", font_color="white", bordercolor="#333"))
     return fig
 
 
@@ -150,6 +152,7 @@ def create_platform_contrast_chart(platform_df):
         plot_bgcolor="#0e1117",
         legend=dict(bgcolor="#0e1117"),
     )
+    fig.update_traces(hoverlabel=dict(bgcolor="#0e1117", font_color="white", bordercolor="#333"))
     return fig
 
 
@@ -181,4 +184,5 @@ def create_sentiment_heatmap(daily_df):
         plot_bgcolor="#0e1117",
         legend=dict(bgcolor="#0e1117"),
     )
+    fig.update_traces(hoverlabel=dict(bgcolor="#0e1117", font_color="white", bordercolor="#333"))
     return fig

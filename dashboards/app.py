@@ -9,6 +9,11 @@ from pathlib import Path
 import plotly.io as pio
 
 pio.templates.default = "plotly_dark"
+pio.templates["plotly_dark"].layout.hoverlabel = dict(
+    bgcolor="#0e1117",
+    font=dict(color="white"),
+    bordercolor="#333",
+)
 
 # Add project root to Python path so src imports work
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -31,6 +36,25 @@ from src.visualization.geo_charts import (
 from src.visualization.topic_charts import create_topic_distribution_chart
 
 st.set_page_config(page_title="South Shore Sentiment Study", page_icon="🏘️", layout="wide")
+
+# Force dark hover tooltips via CSS (Plotly renders them as SVG inside iframe)
+st.markdown(
+    """
+<style>
+    .hoverlayer .hovertext rect {
+        fill: #0e1117 !important;
+        stroke: #333 !important;
+    }
+    .hoverlayer .hovertext text {
+        fill: white !important;
+    }
+    .legend .bg {
+        fill: #0e1117 !important;
+    }
+</style>
+""",
+    unsafe_allow_html=True,
+)
 
 
 @st.cache_data

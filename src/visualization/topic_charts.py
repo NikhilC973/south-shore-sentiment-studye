@@ -16,6 +16,7 @@ def create_topic_distribution_chart(topic_df: pd.DataFrame) -> go.Figure:
         xaxis_title="Number of Posts",
         yaxis=dict(autorange="reversed"),
     )
+    fig.update_traces(hoverlabel=dict(bgcolor="#0e1117", font_color="white", bordercolor="#333"))
     return fig
 
 
@@ -31,4 +32,5 @@ def create_topic_phase_heatmap(df: pd.DataFrame) -> go.Figure:
         )
     )
     fig.update_layout(title="Topic Prevalence by Phase", template="plotly_white", height=450)
+    fig.update_traces(hoverlabel=dict(bgcolor="#0e1117", font_color="white", bordercolor="#333"))
     return fig

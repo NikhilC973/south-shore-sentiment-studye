@@ -47,6 +47,7 @@ def create_neighborhood_chart(geo_df: pd.DataFrame) -> go.Figure:
             )
         ],
     )
+    fig.update_traces(hoverlabel=dict(bgcolor="#0e1117", font_color="white", bordercolor="#333"))
     return fig
 
 
@@ -73,4 +74,5 @@ def create_geo_fear_timeline(df: pd.DataFrame) -> go.Figure:
         height=400,
         yaxis_title="Share (>0.3 fear)",
     )
+    fig.update_traces(hoverlabel=dict(bgcolor="#0e1117", font_color="white", bordercolor="#333"))
     return fig
