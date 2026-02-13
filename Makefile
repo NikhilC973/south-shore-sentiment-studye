@@ -1,7 +1,7 @@
 # ============================================================
 # Aftermath_Sentiment_Study — Makefile
 # ============================================================
-.PHONY: help install init-db ingest ingest-synthetic clean-data analyze dashboard report run-all test lint
+.PHONY: help install hooks-install init-db ingest ingest-synthetic clean-data analyze dashboard report run-all test lint
 
 PYTHON = python
 STREAMLIT = streamlit
@@ -15,6 +15,11 @@ install: ## Install dependencies and package in editable mode
 	pip install -e .  # Install package in editable mode so src imports work
 	$(PYTHON) -m spacy download en_core_web_sm
 	@echo "✅ Dependencies installed and package configured"
+
+hooks-install: ## Install git pre-commit hooks (run once per clone)
+	$(PYTHON) -m pre_commit install
+	@echo "✅ pre-commit hooks installed"
+
 
 init-db: ## Initialize DuckDB database
 	$(PYTHON) -c "from src.utils.db import init_database; init_database()"
