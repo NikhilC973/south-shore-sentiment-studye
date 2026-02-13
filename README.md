@@ -161,6 +161,7 @@ python -m venv .venv && source .venv/bin/activate
 
 # Install (includes editable package installation)
 make install
+make hooks-install  # one-time: ensures git commit hooks are available
 # Or manually:
 # pip install -r requirements.txt
 # pip install -e .  # Install package in editable mode
@@ -190,6 +191,10 @@ make pre-commit-fix  # Format before committing (recommended before git commit)
 ```
 
 **Note on Commits:** If your commits fail due to pre-commit hooks modifying files, run `make pre-commit-fix` first, then commit again. This ensures all code is formatted before the pre-commit hooks run.
+
+**Commit Troubleshooting:**
+- If `git commit` fails with `pre-commit: command not found`, install dev tools with `pip install -r requirements.txt` and run `make hooks-install` once.
+- If hooks reformat files and abort the commit, run `make pre-commit-fix`, `git add -A`, then commit again.
 
 ---
 
