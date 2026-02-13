@@ -115,23 +115,29 @@ with tab1:
                 cols[i].metric(info["label"], "0 posts")
 
     if not data["daily"].empty:
-        st.plotly_chart(create_emotion_trajectory_chart(data["daily"]), width="stretch")
+        st.plotly_chart(create_emotion_trajectory_chart(data["daily"]), width="stretch", theme=None)
 
     c1, c2 = st.columns(2)
     with c1:
         if not data["phase"].empty:
-            st.plotly_chart(create_phase_comparison_chart(data["phase"]), width="stretch")
+            st.plotly_chart(
+                create_phase_comparison_chart(data["phase"]), width="stretch", theme=None
+            )
     with c2:
         if not data["platform"].empty:
-            st.plotly_chart(create_platform_contrast_chart(data["platform"]), width="stretch")
+            st.plotly_chart(
+                create_platform_contrast_chart(data["platform"]), width="stretch", theme=None
+            )
 
     if not data["daily"].empty:
-        st.plotly_chart(create_sentiment_heatmap(data["daily"]), width="stretch")
+        st.plotly_chart(create_sentiment_heatmap(data["daily"]), width="stretch", theme=None)
 
 with tab2:
     st.header("Discussion Themes")
     if not data["topics"].empty:
-        st.plotly_chart(create_topic_distribution_chart(data["topics"]), width="stretch")
+        st.plotly_chart(
+            create_topic_distribution_chart(data["topics"]), width="stretch", theme=None
+        )
         sel = st.selectbox("Explore topic", sorted(data["topics"]["topic_label"].unique()))
         tp = data["topics"][data["topics"]["topic_label"] == sel]
         st.write(f"**{len(tp)} posts**")
@@ -144,11 +150,11 @@ with tab3:
     st.header("Neighborhood Analysis")
     st.warning("⚠️ Geo from text mentions, not GPS. Interpret with caution.")
     if not data["geo"].empty:
-        st.plotly_chart(create_neighborhood_chart(data["geo"]), width="stretch")
+        st.plotly_chart(create_neighborhood_chart(data["geo"]), width="stretch", theme=None)
     if not data["full"].empty:
         fig = create_geo_fear_timeline(data["full"])
         if fig.data:
-            st.plotly_chart(fig, width="stretch")
+            st.plotly_chart(fig, width="stretch", theme=None)
 
 with tab4:
     st.header("Methodology & Ethics")
@@ -185,6 +191,7 @@ with tab5:
             }
         ),
         width="stretch",
+        theme=None,
         hide_index=True,
     )
     st.success(
