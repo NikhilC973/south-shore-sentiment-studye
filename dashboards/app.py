@@ -192,7 +192,6 @@ with tab5:
         ),
         width="stretch",
         theme=None,
-        hide_index=True,
     )
     st.success(
         "**Critical window: Days 2-7.** Fear transforms to organized anger — deploy resources here."
