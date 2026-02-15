@@ -32,7 +32,7 @@ def create_neighborhood_chart(geo_df: pd.DataFrame) -> go.Figure:
     fig.update_layout(
         title="Emotion Intensity by Neighborhood",
         barmode="group",
-        template="plotly_white",
+        template="plotly_dark",
         height=450,
         yaxis_title="Mean Emotion Score",
         annotations=[
@@ -70,7 +70,7 @@ def create_geo_fear_timeline(df: pd.DataFrame) -> go.Figure:
         fig.add_trace(go.Scatter(x=ct.index, y=ct[col], mode="lines+markers", name=col))
     fig.update_layout(
         title="Share of High-Fear Posts by Neighborhood & Phase",
-        template="plotly_white",
+        template="plotly_dark",
         height=400,
         yaxis_title="Share (>0.3 fear)",
     )

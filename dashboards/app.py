@@ -45,9 +45,6 @@ st.markdown(
         fill: #0e1117 !important;
         stroke: #333 !important;
     }
-    .hoverlayer .hovertext text {
-        fill: white !important;
-    }
     .legend .bg {
         fill: #0e1117 !important;
     }
@@ -55,6 +52,10 @@ st.markdown(
 """,
     unsafe_allow_html=True,
 )
+
+# .hoverlayer .hovertext text {
+# fill: white !important;
+# }
 
 
 @st.cache_data
