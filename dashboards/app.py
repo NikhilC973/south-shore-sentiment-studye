@@ -37,25 +37,43 @@ from src.visualization.topic_charts import create_topic_distribution_chart
 
 st.set_page_config(page_title="South Shore Sentiment Study", page_icon="🏘️", layout="wide")
 
-# Force dark hover tooltips via CSS (Plotly renders them as SVG inside iframe)
-st.markdown(
-    """
-<style>
-    .hoverlayer .hovertext rect {
-        fill: #0e1117 !important;
-        stroke: #333 !important;
-    }
-    .legend .bg {
-        fill: #0e1117 !important;
-    }
-</style>
-""",
-    unsafe_allow_html=True,
-)
-
+# # Force dark hover tooltips via CSS (Plotly renders them as SVG inside iframe)
+# st.markdown(
+#     """
+# <style>
+#     .hoverlayer .hovertext rect {
+#         fill: #0e1117 !important;
+#         stroke: #333 !important;
+#     }
+#     .legend .bg {
+#         fill: #0e1117 !important;
+#     }
+# </style>
+# """,
+#     unsafe_allow_html=True,
+# )
 # .hoverlayer .hovertext text {
 # fill: white !important;
 # }
+
+st.markdown(
+    """
+    <style>
+    /* Force dark legend and tooltip backgrounds in Plotly charts */
+    .js-plotly-plot .plotly .legend,
+    .js-plotly-plot .plotly .legend rect,
+    .js-plotly-plot .plotly .hoverlayer .hovertext rect {
+        fill: #0e1117 !important;
+        stroke: #333 !important;
+    }
+    .js-plotly-plot .plotly .hoverlayer .hovertext text,
+    .js-plotly-plot .plotly .legend text {
+        fill: #FAFAFA !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 
 @st.cache_data
